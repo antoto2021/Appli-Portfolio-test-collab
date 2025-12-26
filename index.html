@@ -6,8 +6,8 @@
     <meta name="apple-mobile-web-app-title" content="Green Codex">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="logo appli 2.png">
-    <link rel="icon" type="image/png" href="logo appli 2.png">
+    <link rel="apple-touch-icon" href="logo appli.png">
+    <link rel="icon" type="image/png" href="logo appli.png">
     <title>Green Codex</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -21,7 +21,7 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // VOS CLÉS FIREBASE
+        // CONFIGURATION FIREBASE
         const firebaseConfig = {
           apiKey: "AIzaSyCKuGuHgM3FiuHYdhFunbbqCThQJSBq3tQ",
           authDomain: "green-codex-app.firebaseapp.com",
@@ -37,9 +37,9 @@
                 const app = initializeApp(firebaseConfig);
                 const auth = getAuth(app);
                 const db = getFirestore(app);
-                const appId = 'green_codex_default'; // ID unique pour l'appli partagée
+                const appId = 'green_codex_default'; 
                 
-                // Expose functions globally for the main script
+                // Expose functions globally
                 window.firebaseFuncs = { doc, setDoc, getDoc, collection, getDocs, deleteDoc };
 
                 return new Promise((resolve) => {
@@ -60,46 +60,24 @@
 
     <style>
         body { font-family: 'Roboto', sans-serif; background-color: #F0FDF4; }
-        
-        /* Utils */
         .chart-container { position: relative; width: 100%; height: 350px; margin: 0 auto; }
         .hidden { display: none !important; }
         .fade-in { animation: fadeIn 0.4s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Interactive Cards */
         .card-interactive { cursor: pointer; transition: all 0.3s ease; }
         .card-interactive:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        
-        /* Inputs */
         .input-field { width: 100%; padding: 12px; border-radius: 0.75rem; border: 1px solid #e2e8f0; background: #fff; outline: none; transition: border-color 0.2s; }
         .input-field:focus { border-color: #10b981; ring: 2px solid #10b981; }
         textarea.input-field { min-height: 120px; resize: vertical; }
-
-        /* Edit Mode Styles */
-        .editable-highlight { 
-            border: 2px dashed #F59E0B; cursor: text; border-radius: 4px; position: relative; background-color: rgba(254, 243, 199, 0.3);
-        }
-        .editable-highlight:hover::after { 
-            content: '✎ Modifier'; position: absolute; top: -20px; right: 0; background: #F59E0B; color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; pointer-events: none; z-index: 50; font-weight: bold;
-        }
+        .editable-highlight { border: 2px dashed #F59E0B; cursor: text; border-radius: 4px; position: relative; background-color: rgba(254, 243, 199, 0.3); }
+        .editable-highlight:hover::after { content: '✎ Modifier'; position: absolute; top: -20px; right: 0; background: #F59E0B; color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; pointer-events: none; z-index: 50; font-weight: bold; }
         .edit-mode-active body { border-top: 4px solid #F59E0B; }
-
-        /* Titles Standardization */
         .section-title { font-size: 1.875rem; line-height: 2.25rem; font-weight: 700; color: #064E3B; margin-bottom: 1rem; }
-        
-        /* Justify Utility */
         .text-justify { text-align: justify; }
-
-        /* COLLAPSIBLE SECTIONS STYLES */
-        .collapsible-wrapper {
-            max-height: 0; overflow: hidden; transition: max-height 0.6s ease-in-out, opacity 0.6s ease-in-out; opacity: 0; padding-bottom: 0;
-        }
+        .collapsible-wrapper { max-height: 0; overflow: hidden; transition: max-height 0.6s ease-in-out, opacity 0.6s ease-in-out; opacity: 0; padding-bottom: 0; }
         .expanded .collapsible-wrapper { max-height: 2000px; opacity: 1; padding-bottom: 20px; }
         .toggle-arrow { transition: transform 0.3s ease; cursor: pointer; }
         .expanded .toggle-arrow { transform: rotate(180deg); }
-
-        /* UPDATE SYSTEM STYLES */
         #updateContainer { position: fixed; bottom: 20px; right: 20px; display: flex; align-items: center; justify-content: flex-end; z-index: 9999; gap: 10px; font-family: Arial, sans-serif; }
         #refreshBtn { background-color: #166534; color: white; border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 35px; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); display: flex; justify-content: center; align-items: center; padding: 0; margin: 0; line-height: 1; transition: background-color 0.3s, transform 0.2s; outline: none; -webkit-tap-highlight-color: transparent; user-select: none; }
         #refreshBtn:active { transform: scale(0.95); background-color: #14532d; }
@@ -111,8 +89,6 @@
         .arrow-pointer { font-size: 24px; color: #166534; margin-right: 5px; }
         .bouncing { animation: bounceLeft 0.5s ease-in-out 4; }
         @keyframes bounceLeft { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-10px); } }
-
-        /* Pop-up What's New */
         #wn-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); z-index: 10000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); opacity: 0; transition: opacity 0.3s ease; }
         #wn-modal { background: white; width: 90%; max-width: 400px; border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; position: relative; transform: translateY(20px); transition: transform 0.3s ease; }
         .wn-header { margin-bottom: 20px; }
@@ -132,13 +108,10 @@
         .show-modal { display: flex !important; opacity: 1 !important; }
         .show-modal #wn-modal { transform: translateY(0) !important; }
         .wn-loader { border: 4px solid #f3f3f3; border-top: 4px solid #166534; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto; }
-
-        /* Friends Bar */
         .friend-avatar { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s; font-size: 18px; user-select: none; }
         .friend-avatar:hover { transform: scale(1.1); }
         .friend-avatar.add-btn { background-color: #f1f5f9; color: #cbd5e1; border: 2px dashed #cbd5e1; }
         .friend-avatar.add-btn:hover { border-color: #10b981; color: #10b981; }
-
     </style>
 </head>
 <body class="text-slate-800 pb-32">
@@ -229,7 +202,7 @@
                     <div><strong class="block text-emerald-400 mb-1">Full Melt</strong><span data-editable="lex_3">Un gage de pureté extrême pour un hash (souvent Water Hash) qui fond totalement à la chaleur sans laisser aucun résidu (6 étoiles).</span></div>
                     <div><strong class="block text-emerald-400 mb-1">Solventless</strong><span data-editable="lex_4">Méthodes d'extraction mécaniques utilisant uniquement l'eau, la glace, la chaleur et la pression. Aucune chimie.</span></div>
                     <div><strong class="block text-emerald-400 mb-1">Fresh Frozen</strong><span data-editable="lex_5">Plante congelée immédiatement après récolte (sans séchage) pour préserver les terpènes volatils "vivants" (Live Resin/Rosin).</span></div>
-                    <div><strong class="block text-emerald-400 mb-1">WPFF (Whole Plant)</strong><span data-editable="lex_6">Acronyme de "Whole Plant Fresh Frozen". Désigne le summum de la qualité : contrairement au Fresh Frozen standard, on congèle ici la plante entière.</span></div>
+                    <div><strong class="block text-emerald-400 mb-1">WPFF (Whole Plant)</strong><span data-editable="lex_6">Acronyme de "Whole Plant Fresh Frozen". Désigne le summum de la qualité : contrairement au Fresh Frozen standard, on congèle ici la plante entière (avec ses meilleures fleurs) et non juste les restes de taille.</span></div>
                     <div><strong class="block text-emerald-400 mb-1">Curing</strong><span data-editable="lex_7">Processus d'affinage lent en bocal hermétique. Crucial pour stabiliser l'humidité et développer la complexité aromatique.</span></div>
                     <div><strong class="block text-emerald-400 mb-1">Pheno Hunting</strong><span data-editable="lex_8">L'art de sélectionner la meilleure plante (le meilleur phénotype) parmi des centaines de graines d'une même variété.</span></div>
                     <div><strong class="block text-emerald-400 mb-1">Wash</strong><span data-editable="lex_9">Action de laver la matière végétale dans de l'eau glacée pour en détacher les trichomes (pour faire du Bubble Hash).</span></div>
@@ -250,10 +223,10 @@
             <section class="grid grid-cols-1 lg:grid-cols-2 gap-8"><div class="bg-white p-6 rounded-xl shadow-md"><div class="chart-container"><canvas id="detailRadarChart"></canvas></div></div><div class="bg-white p-6 rounded-xl shadow-md"><div class="chart-container"><canvas id="detailBarChart"></canvas></div></div></section>
         </div>
 
-        <!-- ==================== VIEW: COLLECTION ==================== -->
+        <!-- ==================== VIEW: COLLECTION (MODIFIÉ: BARRE AMIS AJOUTÉE ICI) ==================== -->
         <div id="view-collection" class="hidden fade-in pb-20">
             <!-- BARRE AMIS -->
-            <div class="mb-6 flex items-center justify-between border-b border-slate-200 pb-4 bg-white p-4 rounded-xl shadow-sm">
+            <div class="-mt-4 -mx-4 md:-mt-8 md:-mx-8 mb-6 flex items-center justify-between border-b border-slate-200 pb-4 bg-white p-4 shadow-sm md:rounded-b-xl z-20 relative">
                 <span class="text-xs font-bold text-emerald-500 uppercase tracking-widest flex items-center gap-2"><span>👥</span> Collaboratif</span>
                 <div id="friends-list" class="flex items-center gap-2">
                     <div onclick="promptAddFriend()" class="friend-avatar add-btn" title="Ajouter un ami">+</div>
@@ -271,7 +244,8 @@
 
         <!-- ==================== VIEW: FRIEND PORTFOLIO ==================== -->
         <div id="view-friend" class="hidden fade-in pb-20">
-            <div class="bg-blue-600 text-white p-6 rounded-2xl shadow-lg mb-6">
+            <!-- Header Ami (Collé en haut) -->
+            <div class="-mt-4 -mx-4 md:-mt-8 md:-mx-8 bg-blue-600 text-white p-6 shadow-lg mb-6 md:rounded-b-2xl">
                 <h2 class="text-3xl font-bold mb-2">Portfolio de <span id="friend-view-name">Ami</span></h2>
                 <p class="text-blue-200 text-sm">Mode lecture seule.</p>
             </div>
@@ -359,7 +333,12 @@
                 </div>
                 <div id="hash-fields" class="hidden bg-amber-50 p-3 rounded-lg border border-amber-100 mb-2"><label class="text-xs font-bold text-amber-600 uppercase mb-1">Type de Hash</label><input type="text" name="hashType" id="inp-hashType" class="input-field border-amber-200" placeholder="ex: Dry Sift..."></div>
                 <div class="space-y-1"><label class="text-xs font-bold text-slate-500 uppercase">Variété (Strain)</label><input type="text" name="strain" id="inp-strain" class="input-field font-bold" placeholder="ex: Gelato #41" required></div>
-                <div class="space-y-1"><label class="text-xs font-bold text-slate-500 uppercase">Nom Commercial</label><input type="text" name="commercialName" id="inp-commercialName" class="input-field" placeholder="ex: Blue Magic"></div>
+                <!-- FARM INPUT ADDED HERE -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1"><label class="text-xs font-bold text-slate-500 uppercase">Nom Commercial</label><input type="text" name="commercialName" id="inp-commercialName" class="input-field" placeholder="ex: Blue Magic"></div>
+                    <div class="space-y-1"><label class="text-xs font-bold text-slate-500 uppercase">Farm / Producteur</label><input type="text" name="farm" id="inp-farm" class="input-field" placeholder="ex: The Ten Co"></div>
+                </div>
+
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-1"><label class="text-xs font-bold text-slate-500 uppercase">Pays</label><input type="text" name="country" id="inp-country" class="input-field" placeholder="ex: Pays-Bas"></div>
                     <div class="space-y-1"><label class="text-xs font-bold text-slate-500 uppercase">Prix (€)</label><input type="number" name="price" id="inp-price" class="input-field" placeholder="ex: 50"></div>
@@ -379,7 +358,63 @@
     <div id="collection-detail-modal" class="hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300">
         <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col animate-fade-in">
             <div id="cd-img-container" class="w-full h-64 bg-slate-900 relative flex-shrink-0 group"><img id="cd-main-img" class="w-full h-full object-contain"><button onclick="closeCollectionDetail()" class="absolute top-4 right-4 bg-white/20 text-white rounded-full p-2 hover:bg-white/40 backdrop-blur-sm transition">✕</button><div id="cd-thumbs" class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 px-4 overflow-x-auto z-10"></div></div>
-            <div class="p-6 overflow-y-auto"><div class="flex justify-between items-start mb-4"><div><h2 id="cd-strain" class="text-3xl font-black text-slate-800 leading-tight">Strain</h2><p id="cd-commercial" class="text-emerald-600 font-bold uppercase text-sm tracking-wider mt-1">Commercial</p></div><div class="text-5xl" id="cd-flag">🏳️</div></div><div class="grid grid-cols-2 gap-4 mb-6"><div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center"><span class="text-[10px] uppercase text-slate-400 font-bold block">Quantité</span><span id="cd-quantity" class="text-xl font-black text-slate-700">0g</span></div><div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center"><span class="text-[10px] uppercase text-slate-400 font-bold block">Prix</span><span id="cd-price" class="text-xl font-black text-slate-700">0€</span></div><div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center"><span class="text-[10px] uppercase text-slate-400 font-bold block">Type</span><span id="cd-category" class="text-lg font-bold text-slate-700">Weed</span></div><div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center"><span class="text-[10px] uppercase text-slate-400 font-bold block">Date</span><span id="cd-date" class="text-sm font-bold text-slate-700">...</span></div></div><div id="cd-observation-container" class="bg-slate-50 p-4 rounded-xl border border-slate-100 mb-6 hidden"><h4 class="text-xs font-bold text-slate-500 uppercase mb-2">Observations</h4><p id="cd-observation" class="text-sm text-slate-700 italic text-justify"></p></div><div class="flex gap-3"><button id="cd-btn-edit" class="flex-1 py-3 rounded-xl border border-blue-200 text-blue-600 font-bold hover:bg-blue-50 transition">Modifier</button><button id="cd-btn-delete" class="flex-1 py-3 rounded-xl border border-red-200 text-red-500 font-bold hover:bg-red-50 transition">Supprimer</button></div></div>
+            <div class="p-6 overflow-y-auto">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h2 id="cd-strain" class="text-3xl font-black text-slate-800 leading-tight">Strain</h2>
+                        <p class="text-emerald-600 font-bold uppercase text-sm tracking-wider mt-1">
+                            <span id="cd-commercial">Commercial</span>
+                            <span id="cd-hash-badge" class="hidden ml-2 bg-amber-100 text-amber-700 px-2 py-0.5 rounded text-xs border border-amber-200"></span>
+                        </p>
+                    </div>
+                    <div class="text-5xl" id="cd-flag">🏳️</div>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-6"><div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center"><span class="text-[10px] uppercase text-slate-400 font-bold block">Quantité</span><span id="cd-quantity" class="text-xl font-black text-slate-700">0g</span></div><div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center"><span class="text-[10px] uppercase text-slate-400 font-bold block">Prix</span><span id="cd-price" class="text-xl font-black text-slate-700">0€</span></div><div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center"><span class="text-[10px] uppercase text-slate-400 font-bold block">Type</span><span id="cd-category" class="text-lg font-bold text-slate-700">Weed</span></div><div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center"><span class="text-[10px] uppercase text-slate-400 font-bold block">Date</span><span id="cd-date" class="text-sm font-bold text-slate-700">...</span></div></div>
+                <div id="cd-observation-container" class="bg-slate-50 p-4 rounded-xl border border-slate-100 mb-6 hidden"><h4 class="text-xs font-bold text-slate-500 uppercase mb-2">Observations</h4><p id="cd-observation" class="text-sm text-slate-700 italic text-justify"></p></div>
+                
+                <div class="space-y-3 text-sm text-slate-600 mb-8 bg-white rounded-xl">
+                    <div class="flex justify-between border-b border-slate-100 pb-2">
+                        <span>Producteur / Farm</span>
+                        <span id="cd-farm" class="font-bold text-slate-800">Unknown</span>
+                    </div>
+                    <!-- REMOVED OTHER ROWS -->
+                </div>
+                
+                <div class="flex gap-3"><button id="cd-btn-edit" class="flex-1 py-3 rounded-xl border border-blue-200 text-blue-600 font-bold hover:bg-blue-50 transition">Modifier</button><button id="cd-btn-delete" class="flex-1 py-3 rounded-xl border border-red-200 text-red-500 font-bold hover:bg-red-50 transition">Supprimer</button></div></div>
+        </div>
+    </div>
+
+    <!-- MODAL: FRIEND DETAIL -->
+    <div id="friend-detail-modal" class="hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col animate-fade-in">
+            <div class="w-full h-32 bg-blue-600 relative flex-shrink-0 group flex items-center justify-center">
+                <span class="text-6xl">👤</span>
+                <button onclick="closeFriendDetail()" class="absolute top-4 right-4 bg-white/20 text-white rounded-full p-2 hover:bg-white/40 backdrop-blur-sm transition">✕</button>
+            </div>
+            <div class="p-6 overflow-y-auto">
+                <div class="flex justify-between items-start mb-4">
+                    <div><h2 id="fd-strain" class="text-3xl font-black text-slate-800 leading-tight">Strain</h2><p id="fd-commercial" class="text-emerald-600 font-bold uppercase text-sm tracking-wider mt-1">Commercial</p></div>
+                    <div class="text-5xl" id="fd-flag">🏳️</div>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center"><span class="text-[10px] uppercase text-slate-400 font-bold block">Quantité</span><span id="fd-quantity" class="text-xl font-black text-slate-700">0g</span></div>
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center"><span class="text-[10px] uppercase text-slate-400 font-bold block">Prix</span><span id="fd-price" class="text-xl font-black text-slate-700">0€</span></div>
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center"><span class="text-[10px] uppercase text-slate-400 font-bold block">Type</span><span id="fd-category" class="text-lg font-bold text-slate-700">Weed</span></div>
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center"><span class="text-[10px] uppercase text-slate-400 font-bold block">Date</span><span id="fd-date" class="text-sm font-bold text-slate-700">...</span></div>
+                </div>
+                <!-- AJOUT DETAIL OBSERVATION -->
+                <div id="fd-observation-container" class="bg-slate-50 p-4 rounded-xl border border-slate-100 mb-6 hidden">
+                    <h4 class="text-xs font-bold text-slate-500 uppercase mb-2">Observations</h4>
+                    <p id="fd-observation" class="text-sm text-slate-700 italic text-justify"></p>
+                </div>
+
+                <div class="space-y-3 text-sm text-slate-600 mb-8 bg-white rounded-xl">
+                    <div class="flex justify-between border-b border-slate-100 pb-2 hidden" id="fd-hash-row">
+                        <span>Technique Hash</span>
+                        <span id="fd-hash-type" class="font-bold text-amber-600">-</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -402,7 +437,7 @@
         // ⚠️ CONFIGURATION GITHUB ⚠️
         // ============================================================
         const GITHUB_USERNAME = 'antoto2021'; 
-        const GITHUB_REPO     = 'Appli-Portfolio-test-collab';        
+        const GITHUB_REPO     = 'Appli-Portfolio';        
         const UPDATE_STORAGE_KEY = 'green_codex_last_hash';
         const UPDATE_TIME_KEY    = 'green_codex_update_timestamp';
 
@@ -501,22 +536,19 @@
         // --- COLLECTION LOGIC ---
         async function saveCollectionItem(item) {
             try {
-                // Save locally first
                 const id = await db.save('collection', item);
                 item.id = id; 
-                
-                // Refresh local view
                 collection = await db.getAll('collection');
                 updateDashboardStats();
                 renderCollectionList();
                 
-                // Sync to Cloud (Sans photos et sans liste d'amis)
+                // Sync to Cloud (Sans photos)
                 if(window.firebaseFuncs && firebaseInstance) {
                     try {
                         const { setDoc, doc } = window.firebaseFuncs;
                         const { db: firestore, appId } = firebaseInstance;
                         const cleanItem = { ...item, photos: [] }; // Strip photos for sync
-                        // On n'envoie JAMAIS la liste d'amis
+                        // NOTE: We do NOT sync the friends list. It remains local.
                         await setDoc(doc(firestore, 'artifacts', appId, 'users', myUid, 'portfolio', id.toString()), cleanItem);
                     } catch(e) { console.error("Sync Error", e); }
                 }
@@ -545,7 +577,7 @@
             }
         }
 
-        // --- FRIENDS LOGIC (LOCAL ONLY - NO SYNC) ---
+        // --- FRIENDS LOGIC (LOCAL ONLY) ---
         async function promptAddFriend() {
             const friendId = prompt("Entrez l'ID Unique de votre ami (disponible dans l'onglet Info de son appli) :");
             if (friendId && friendId.length > 5) {
@@ -561,6 +593,7 @@
 
         function renderFriendsList() {
             const container = document.getElementById('friends-list');
+            const addBtn = container.querySelector('.add-btn');
             container.innerHTML = '';
             
             friends.forEach(f => {
@@ -571,12 +604,6 @@
                 el.onclick = () => viewFriendPortfolio(f);
                 container.appendChild(el);
             });
-            // Add Button always at the end
-            const addBtn = document.createElement('div');
-            addBtn.className = 'friend-avatar add-btn';
-            addBtn.innerText = '+';
-            addBtn.title = 'Ajouter un ami';
-            addBtn.onclick = () => promptAddFriend();
             container.appendChild(addBtn);
         }
 
@@ -673,13 +700,26 @@
         function updateDashboardStats(){document.getElementById('stats-total').innerText=collection.length;document.getElementById('stats-weed').innerText=collection.filter(i=>i.category==='weed').length;document.getElementById('stats-hash').innerText=collection.filter(i=>i.category==='hash').length;document.getElementById('stats-mass').innerText=collection.reduce((a,c)=>a+(parseFloat(c.quantity)||0),0).toFixed(1)+'g'; calculateStorageUsage();}
         function renderCollectionList(){const c=document.getElementById('collection-list');c.innerHTML='';document.getElementById('empty-state').classList.toggle('hidden',collection.length>0);[...collection].reverse().forEach(i=>{const p=i.photos&&i.photos.length?`<img src="${i.photos[0]}" class="w-full h-full object-cover">`:`<div class="w-full h-full flex items-center justify-center text-3xl opacity-30">${i.category==='hash'?'🍫':'🥦'}</div>`;const h=`<div onclick="openCollectionDetail(${i.id})" class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 flex gap-4 relative group hover:border-emerald-300 transition cursor-pointer"><div class="w-20 h-20 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden relative">${p}</div><div class="flex-1 min-w-0"><div class="flex justify-between items-start"><h3 class="font-bold text-slate-800 truncate pr-2">${i.strain}</h3><span class="text-xl">${getFlag(i.country)}</span></div><p class="text-xs text-slate-500 font-bold uppercase mb-1">${i.commercialName||'Inconnu'}</p>${i.type?`<span class="bg-amber-100 text-amber-800 text-[10px] px-1.5 py-0.5 rounded border border-amber-200 block w-fit mb-1">${i.type}</span>`:''}<div class="flex items-center gap-2 mt-2"><span class="bg-emerald-50 text-emerald-700 text-xs px-2 py-1 rounded font-bold">${i.quantity}g</span></div></div></div>`;c.insertAdjacentHTML('beforeend',h)})}
         
-        function openCollectionForm(id=null){const f=document.getElementById('collection-form');f.reset();document.getElementById('editId').value=id||"";currentPhotos=[];const d=new Date().toISOString().split('T')[0];document.getElementById('inp-date').value=d;if(id){const i=collection.find(x=>x.id==id);if(i){document.getElementById('inp-category').value=i.category;document.getElementById('inp-quantity').value=i.quantity;document.getElementById('inp-strain').value=i.strain;document.getElementById('inp-commercialName').value=i.commercialName;document.getElementById('inp-country').value=i.country;document.getElementById('inp-price').value=i.price;if(i.type)document.getElementById('inp-hashType').value=i.type;document.getElementById('inp-observation').value=i.observation||"";if(i.date)document.getElementById('inp-date').value=i.date.split('T')[0];toggleFormFields(i.category);if(i.photos)currentPhotos=[...i.photos]}}else{toggleFormFields('weed')}renderPhotoPreviews();document.getElementById('collection-modal').classList.remove('hidden')}
-        async function handleCollectionSubmit(e){e.preventDefault();const f=new FormData(e.target),eid=document.getElementById('editId').value,dr=f.get('date'),do_=dr?new Date(dr+'T12:00:00'):new Date();const i={category:f.get('category'),quantity:f.get('quantity'),strain:f.get('strain'),commercialName:f.get('commercialName'),type:f.get('hashType'),country:f.get('country'),price:f.get('price'),observation:f.get('observation'),photos:currentPhotos,date:do_.toISOString()};if(eid)i.id=parseInt(eid);await saveCollectionItem(i);closeCollectionForm()}
+        function openCollectionForm(id=null){const f=document.getElementById('collection-form');f.reset();document.getElementById('editId').value=id||"";currentPhotos=[];const d=new Date().toISOString().split('T')[0];document.getElementById('inp-date').value=d;if(id){const i=collection.find(x=>x.id==id);if(i){document.getElementById('inp-category').value=i.category;document.getElementById('inp-quantity').value=i.quantity;document.getElementById('inp-strain').value=i.strain;document.getElementById('inp-commercialName').value=i.commercialName;document.getElementById('inp-country').value=i.country;document.getElementById('inp-price').value=i.price;if(i.type)document.getElementById('inp-hashType').value=i.type;document.getElementById('inp-observation').value=i.observation||"";
+        document.getElementById('inp-farm').value=i.farm||""; // Load Farm
+        if(i.date)document.getElementById('inp-date').value=i.date.split('T')[0];toggleFormFields(i.category);if(i.photos)currentPhotos=[...i.photos]}}else{toggleFormFields('weed')}renderPhotoPreviews();document.getElementById('collection-modal').classList.remove('hidden')}
+        async function handleCollectionSubmit(e){e.preventDefault();const f=new FormData(e.target),eid=document.getElementById('editId').value,dr=f.get('date'),do_=dr?new Date(dr+'T12:00:00'):new Date();const i={category:f.get('category'),quantity:f.get('quantity'),strain:f.get('strain'),commercialName:f.get('commercialName'),type:f.get('hashType'),country:f.get('country'),price:f.get('price'),observation:f.get('observation'),farm:f.get('farm'),photos:currentPhotos,date:do_.toISOString()};if(eid)i.id=parseInt(eid);await saveCollectionItem(i);closeCollectionForm()}
         function closeCollectionForm(){document.getElementById('collection-modal').classList.add('hidden')}
         async function handlePhotos(i){if(i.files){for(const f of i.files){try{currentPhotos.push(await compressImage(f,1200,0.8))}catch{}}renderPhotoPreviews()}}
         function renderPhotoPreviews(){document.getElementById('photo-preview-list').innerHTML=currentPhotos.map((s,i)=>`<div class="w-20 h-20 rounded-xl relative overflow-hidden group flex-shrink-0"><img src="${s}" class="w-full h-full object-cover"><button type="button" onclick="currentPhotos.splice(${i},1);renderPhotoPreviews()" class="absolute top-0 right-0 bg-red-500 text-white text-xs p-1 opacity-0 group-hover:opacity-100">X</button></div>`).join('')}
         
-        function openCollectionDetail(id){const i=collection.find(x=>x.id==id);if(!i)return;document.getElementById('cd-strain').innerText=i.strain;document.getElementById('cd-commercial').innerText=i.commercialName||'Sans nom';document.getElementById('cd-flag').innerText=getFlag(i.country);document.getElementById('cd-quantity').innerText=i.quantity+'g';document.getElementById('cd-price').innerText=i.price+'€';document.getElementById('cd-category').innerText=i.category==='hash'?'Hash 🍫':'Weed 🥦';document.getElementById('cd-date').innerText=new Date(i.date).toLocaleDateString();if(i.observation){document.getElementById('cd-observation').innerText=i.observation;document.getElementById('cd-observation-container').classList.remove('hidden')}else{document.getElementById('cd-observation-container').classList.add('hidden')}document.getElementById('cd-btn-edit').onclick=()=>{closeCollectionDetail();openCollectionForm(id)};document.getElementById('cd-btn-delete').onclick=()=>{deleteCollectionItem(id)};const m=document.getElementById('cd-main-img'),t=document.getElementById('cd-thumbs');t.innerHTML='';if(i.photos&&i.photos.length>0){m.src=i.photos[0];m.classList.remove('opacity-30','p-10');if(i.photos.length>1){i.photos.forEach(s=>{const el=document.createElement('img');el.src=s;el.className="w-12 h-12 rounded-lg border-2 border-white/50 cursor-pointer object-cover";el.onclick=()=>m.src=s;t.appendChild(el)})}}else{m.src=""}document.getElementById('collection-detail-modal').classList.remove('hidden')}
+        function openCollectionDetail(id){const i=collection.find(x=>x.id==id);if(!i)return;document.getElementById('cd-strain').innerText=i.strain;
+        document.getElementById('cd-commercial').innerText=i.commercialName||'Sans nom';
+        if(i.category === 'hash' && i.type) {
+            const badge = document.getElementById('cd-hash-badge');
+            badge.innerText = i.type;
+            badge.classList.remove('hidden');
+        } else {
+            document.getElementById('cd-hash-badge').classList.add('hidden');
+        }
+        document.getElementById('cd-flag').innerText=getFlag(i.country);document.getElementById('cd-quantity').innerText=i.quantity+'g';document.getElementById('cd-price').innerText=i.price+'€';document.getElementById('cd-category').innerText=i.category==='hash'?'Hash 🍫':'Weed 🥦';document.getElementById('cd-date').innerText=new Date(i.date).toLocaleDateString();if(i.observation){document.getElementById('cd-observation').innerText=i.observation;document.getElementById('cd-observation-container').classList.remove('hidden')}else{document.getElementById('cd-observation-container').classList.add('hidden')}
+        document.getElementById('cd-farm').innerText = i.farm || 'Inconnu';
+        document.getElementById('cd-btn-edit').onclick=()=>{closeCollectionDetail();openCollectionForm(id)};document.getElementById('cd-btn-delete').onclick=()=>{deleteCollectionItem(id)};const m=document.getElementById('cd-main-img'),t=document.getElementById('cd-thumbs');t.innerHTML='';if(i.photos&&i.photos.length>0){m.src=i.photos[0];m.classList.remove('opacity-30','p-10');if(i.photos.length>1){i.photos.forEach(s=>{const el=document.createElement('img');el.src=s;el.className="w-12 h-12 rounded-lg border-2 border-white/50 cursor-pointer object-cover";el.onclick=()=>m.src=s;t.appendChild(el)})}}else{m.src=""}document.getElementById('collection-detail-modal').classList.remove('hidden')}
         function closeCollectionDetail(){document.getElementById('collection-detail-modal').classList.add('hidden')}
         function openSectionModal(id=null){document.getElementById('section-form').reset();document.getElementById('sec-current-image').classList.add('hidden');currentSectionImage=null;if(id){const s=customSections.find(x=>x.id===id);document.getElementById('sec-id').value=s.id;document.getElementById('sec-title').value=s.title;document.getElementById('sec-text').value=s.text;if(s.image){currentSectionImage=s.image;document.querySelector('#sec-current-image img').src=s.image;document.getElementById('sec-current-image').classList.remove('hidden')}}document.getElementById('section-modal').classList.remove('hidden')}
         function closeSectionModal(){document.getElementById('section-modal').classList.add('hidden')}
