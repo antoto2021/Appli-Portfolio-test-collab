@@ -85,8 +85,8 @@
         .rotating { animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         #updateAlert { display: none; flex-direction: row; align-items: center; }
-        .update-text { color: #166534; font-weight: bold; font-size: 14px; margin-right: 5px; background: rgba(255,255,255,0.95); padding: 6px 10px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .arrow-pointer { font-size: 24px; color: #166534; margin-right: 5px; }
+        .update-text { color: #166534; font-weight: bold; font-size: 18px; margin-right: 5px; background: rgba(255,255,255,0.95); padding: 6px 10px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .arrow-pointer { font-size: 28px; color: #166534; margin-right: 5px; }
         .bouncing { animation: bounceLeft 0.5s ease-in-out 4; }
         @keyframes bounceLeft { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-10px); } }
         #wn-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); z-index: 10000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); opacity: 0; transition: opacity 0.3s ease; }
@@ -139,10 +139,31 @@
             
             <!-- INTRO -->
             <section id="intro-card" class="bg-white rounded-2xl shadow-md p-8 border-l-8 border-emerald-600 relative group transition-all duration-300">
-                <div class="flex items-center gap-2 mb-2 cursor-pointer" onclick="toggleSection('intro-card')"><h2 class="section-title mb-0" data-editable="intro_title">L'Odyssée de la Plante</h2></div>
-                <div class="text-lg leading-relaxed text-slate-600 text-justify mb-4" data-editable="intro_teaser"><p>L'histoire du <strong>Cannabis Sativa L.</strong> est une épopée botanique et culturelle qui traverse les millénaires. Née dans les steppes d'Asie Centrale, probablement près du plateau tibétain, cette plante a été domestiquée par l'homme il y a plus de 10 000 ans, initialement pour ses fibres robustes et ses graines nutritives.</p></div>
-                <div class="collapsible-wrapper"><div class="text-lg leading-relaxed text-slate-600 space-y-4 text-justify" data-editable="intro_text"><p>Au fil des siècles, la plante a voyagé le long des routes de la soie, s'adaptant à divers climats pour donner naissance à deux grandes lignées : les variétés tropicales, élancées et énergisantes (Sativa), et les variétés de montagne, trapues et résineuses (Indica). Cette diversité génétique est aujourd'hui la base de milliers d'hybrides modernes.</p><p>Historiquement, deux grandes traditions de consommation s'opposent et se complètent. D'un côté, la culture de la <strong>Fleur (Weed)</strong>, séchée avec soin pour préserver ses arômes délicats. De l'autre, l'art ancestral du <strong>Hashish</strong>, perfectionné au Moyen-Orient et en Asie (Maroc, Afghanistan, Népal), qui consiste à séparer mécaniquement les trichomes pour obtenir un concentré pur, stable et puissant.</p><p>Aujourd'hui, nous vivons une véritable renaissance cannabique. La science moderne nous permet enfin de décrypter l'interaction subtile entre les cannabinoïdes (THC, CBD...) et les terpènes (les molécules aromatiques). Cette application, le Green Codex, est conçue pour vous guider dans cette nouvelle ère, vous aidant à comprendre, archiver et apprécier la complexité de chaque produit.</p></div></div>
-                <button onclick="toggleSection('intro-card')" class="absolute bottom-2 left-2 text-emerald-600 p-2 hover:bg-emerald-50 rounded-full transition"><svg class="w-6 h-6 toggle-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                <div class="flex items-center gap-2 mb-2 cursor-pointer" onclick="toggleSection('intro-card')">
+                    <h2 class="section-title mb-0" data-editable="intro_title">L'Odyssée de la Plante</h2>
+                </div>
+                
+                <!-- Partie toujours visible (Teaser) -->
+                <div class="text-lg leading-relaxed text-slate-600 text-justify mb-4" data-editable="intro_teaser">
+                    <p>L'histoire du <strong>Cannabis Sativa L.</strong> est une épopée botanique et culturelle qui traverse les millénaires. Née dans les steppes d'Asie Centrale, probablement près du plateau tibétain, cette plante a été domestiquée par l'homme il y a plus de 10 000 ans, initialement pour ses fibres robustes et ses graines nutritives.</p>
+                </div>
+
+                <!-- Partie repliable -->
+                <div class="collapsible-wrapper">
+                    <div class="text-lg leading-relaxed text-slate-600 space-y-4 text-justify" data-editable="intro_text">
+                        <p>Au fil des siècles, la plante a voyagé le long des routes de la soie, s'adaptant à divers climats pour donner naissance à deux grandes lignées : les variétés tropicales, élancées et énergisantes (Sativa), et les variétés de montagne, trapues et résineuses (Indica). Cette diversité génétique est aujourd'hui la base de milliers d'hybrides modernes.</p>
+                        
+                        <p>Historiquement, deux grandes traditions de consommation s'opposent et se complètent. D'un côté, la culture de la <strong>Fleur (Weed)</strong>, séchée avec soin pour préserver ses arômes délicats. De l'autre, l'art ancestral du <strong>Hashish</strong>, perfectionné au Moyen-Orient et en Asie (Maroc, Afghanistan, Népal), qui consiste à séparer mécaniquement les trichomes pour obtenir un concentré pur, stable et puissant.</p>
+                        
+                        <p>Aujourd'hui, nous vivons une véritable renaissance cannabique. La science moderne nous permet enfin de décrypter l'interaction subtile entre les cannabinoïdes (THC, CBD...) et les terpènes (les molécules aromatiques).</p>
+
+                        <p>Cette application, le Green Codex, est conçue pour vous guider dans cette nouvelle ère, vous aidant à comprendre, archiver et apprécier la complexité de chaque produit.</p>
+                    </div>
+                </div>
+                
+                <button onclick="toggleSection('intro-card')" class="absolute bottom-2 left-2 text-emerald-600 p-2 hover:bg-emerald-50 rounded-full transition">
+                    <svg class="w-6 h-6 toggle-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
             </section>
 
             <!-- MY COLLECTION PREVIEW -->
@@ -171,22 +192,44 @@
                 <div class="mb-8 border-b border-slate-200 pb-4"><h2 class="section-title" data-editable="fam_title">Les Familles Fondamentales</h2><p class="text-slate-600 max-w-3xl text-justify" data-editable="fam_desc">Le marché moderne se divise en deux grands royaumes : la fleur brute et les extractions. Chacun possède ses méthodes, ses rituels et ses profils aromatiques distincts.</p></div>
                 <h3 class="text-xl font-bold text-slate-700 mb-4 flex items-center" data-editable="fam_sub1">🧪 Concentrés (Hash)</h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                    <div onclick="showDetail('hash_dry')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-amber-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">🏜️</div> <span class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded h-fit">TRADITION</span> </div><h3 class="text-xl font-bold text-slate-800 group-hover:text-amber-600">Dry Sift</h3><p class="text-sm text-slate-500 text-justify mt-2">Le tamisage à sec traditionnel est une technique artisanale d'extraction de résine. En frottant délicatement les fleurs séchées sur des tamis ultra-fins, on sépare les trichomes de la matière végétale. On obtient ainsi un kief pur et savoureux, apprécié pour sa grande finesse.</p></div>
-                    <div onclick="showDetail('hash_water')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-blue-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">❄️</div> <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded h-fit">PURETÉ</span> </div><h3 class="text-xl font-bold text-slate-800 group-hover:text-blue-600">Ice-O-Lator</h3><p class="text-sm text-slate-500 text-justify mt-2">Extraction à l'eau et glace (Solventless), utilise l'eau glacée pour extraire les trichomes. Le froid rend les glandes de résine cassantes, facilitant leur séparation par agitation. Le mélange est ensuite filtré à travers plusieurs sacs aux mailles de plus en plus serrées pour obtenir de l'Ice-O-Lator ou Bubble Hash.</p></div>
-                    <div onclick="showDetail('hash_rosin')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-purple-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">🔥</div> <span class="text-xs font-bold text-purple-600 bg-purple-50 px-2 py-1 rounded h-fit">MODERNE</span> </div><h3 class="text-xl font-bold text-slate-800 group-hover:text-purple-600">Rosin</h3><p class="text-sm text-slate-500 text-justify mt-2">Une extraction 100 % naturelle obtenue par pression mécanique. En appliquant simultanément de la chaleur et une forte pression sur des fleurs ou du hash, on libère une résine pure, collante et ultra-concentrée, sans jamais utiliser de solvants chimiques.</p></div>
+                    <div onclick="showDetail('hash_dry')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-amber-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">🏜️</div> <span class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded h-fit">TRADITION</span> </div>
+					<h3 class="text-xl font-bold text-slate-800 group-hover:text-amber-600">Dry Sift</h3>
+					<p class="text-sm text-slate-500 text-justify mt-2">Le tamisage à sec traditionnel est une technique artisanale d'extraction de résine. En frottant délicatement les fleurs séchées sur des tamis ultra-fins, 
+                            on sépare les trichomes de la matière végétale. On obtient ainsi un kief pur et savoureux, apprécié pour sa grande finesse.</p></div>
+                    <div onclick="showDetail('hash_water')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-blue-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">❄️</div> <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded h-fit">PURETÉ</span> </div>
+					<h3 class="text-xl font-bold text-slate-800 group-hover:text-blue-600">Ice-O-Lator</h3>
+					<p class="text-sm text-slate-500 text-justify mt-2">L'extraction à l'eau et glace (Solventless), utilise l'eau glacée pour extraire les trichomes. Le froid rend les glandes de résine cassantes, facilitant 
+                            leur séparation par agitation. Le mélange est ensuite filtré à travers plusieurs sacs aux mailles de plus en plus serrées pour obtenir de l'Ice-O-Lator ou Bubble Hash.</p></div>
+                    <div onclick="showDetail('hash_rosin')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-purple-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">🔥</div> <span class="text-xs font-bold text-purple-600 bg-purple-50 px-2 py-1 rounded h-fit">MODERNE</span> </div>
+					<h3 class="text-xl font-bold text-slate-800 group-hover:text-purple-600">Rosin</h3>
+					<p class="text-sm text-slate-500 text-justify mt-2">C'est une extraction 100 % naturelle obtenue par pression mécanique. En appliquant simultanément de la chaleur et une forte pression sur des fleurs ou du hash, 
+                            on libère une résine pure, collante et ultra-concentrée, sans jamais utiliser de solvants chimiques.</p></div>
                 </div>
                 <h3 class="text-xl font-bold text-slate-700 mb-4 flex items-center" data-editable="fam_sub2">🌱 Fleur (Weed)</h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div onclick="showDetail('weed_indica')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-indigo-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">🏔️</div> <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded h-fit">RELAX</span> </div><h3 class="text-xl font-bold text-slate-800 group-hover:text-indigo-600">Indica</h3><p class="text-sm text-slate-500 text-justify mt-2">C'est une variété de cannabis originaire des régions montagneuses comme l'Hindou Kouch. Petite et trapue, elle se reconnaît à ses feuilles larges et sombres. Elle est réputée pour ses effets relaxants et corporels ("stone"), idéaux pour apaiser le stress ou favoriser le sommeil.</p></div>
-                    <div onclick="showDetail('weed_sativa')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-yellow-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">☀️</div> <span class="text-xs font-bold text-yellow-600 bg-yellow-50 px-2 py-1 rounded h-fit">ÉNERGIE</span> </div><h3 class="text-xl font-bold text-slate-800 group-hover:text-yellow-600">Sativa</h3><p class="text-sm text-slate-500 text-justify mt-2">C'est une variété originaire des régions tropicales. Grande et élancée, elle possède des feuilles fines et des cycles de floraison longs. Elle est recherchée pour ses effets stimulants et cérébraux ("high"), favorisant la créativité, l'énergie et la concentration.</p></div>
-                    <div onclick="showDetail('weed_exotic')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-pink-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">🧬</div> <span class="text-xs font-bold text-pink-600 bg-pink-50 px-2 py-1 rounded h-fit">HYBRIDE</span> </div><h3 class="text-xl font-bold text-slate-800 group-hover:text-pink-600">Exotics</h3><p class="text-sm text-slate-500 text-justify mt-2">Elle désigne des variétés de cannabis haut de gamme, souvent issues de croisements complexes aux États-Unis. Elles se distinguent par des couleurs vibrantes, des arômes intenses et uniques, ainsi qu'une puissance élevée. C'est le segment « luxe » du marché, privilégiant la qualité visuelle et gustative.</p></div>
+                    <div onclick="showDetail('weed_indica')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-indigo-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">🏔️</div> <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded h-fit">RELAX</span> </div>
+					<h3 class="text-xl font-bold text-slate-800 group-hover:text-indigo-600">Indica</h3>
+					<p class="text-sm text-slate-500 text-justify mt-2">C'est une variété de cannabis originaire des régions montagneuses comme l'Hindou Kouch. Petite et trapue, elle se reconnaît à ses feuilles larges et sombres. 
+                            Elle est réputée pour ses effets relaxants et corporels ("stone"), idéaux pour apaiser le stress ou favoriser le sommeil.</p></div>
+                    <div onclick="showDetail('weed_sativa')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-yellow-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">☀️</div> <span class="text-xs font-bold text-yellow-600 bg-yellow-50 px-2 py-1 rounded h-fit">ÉNERGIE</span> </div>
+					<h3 class="text-xl font-bold text-slate-800 group-hover:text-yellow-600">Sativa</h3>
+					<p class="text-sm text-slate-500 text-justify mt-2">C'est une variété originaire des régions tropicales. Grande et élancée, elle possède des feuilles fines et des cycles de floraison longs. Elle est recherchée 
+                            pour ses effets stimulants et cérébraux ("high"), favorisant la créativité, l'énergie et la concentration.</p></div>
+                    <div onclick="showDetail('weed_exotic')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-pink-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">🧬</div> <span class="text-xs font-bold text-pink-600 bg-pink-50 px-2 py-1 rounded h-fit">HYBRIDE</span> </div>
+					<h3 class="text-xl font-bold text-slate-800 group-hover:text-pink-600">Exotics</h3>
+					<p class="text-sm text-slate-500 text-justify mt-2">Elle désigne des variétés de cannabis haut de gamme, souvent issues de croisements complexes aux États-Unis. Elles se distinguent par des couleurs vibrantes, 
+                            des arômes intenses et uniques, ainsi qu'une puissance élevée. C'est le segment « luxe » du marché, privilégiant la qualité visuelle et gustative</p></div>
                 </div>
             </section>
 
             <!-- POTENCY -->
             <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg"><h2 class="section-title" data-editable="potency_title">Échelle de Puissance</h2><p class="text-slate-600 mb-4 text-sm text-justify" data-editable="potency_desc">Comparatif des taux moyens de THC observés en laboratoire.</p><div class="chart-container"><canvas id="potencyChart"></canvas></div></div>
-                <div class="lg:col-span-1 bg-emerald-50 border-l-4 border-emerald-500 p-6 rounded-r-xl"><h4 class="font-bold text-emerald-900 text-lg mb-2" data-editable="didyouknow_title">Le Mythe du THC</h4><p class="text-sm text-emerald-800 leading-relaxed text-justify" data-editable="didyouknow_text">Attention : un taux de THC élevé (80%+) ne garantit pas une expérience "meilleure". C'est l'<strong>Effet d'Entourage</strong> qui compte : la synergie complexe entre les cannabinoïdes et les terpènes.</p><p class="text-sm text-emerald-800 leading-relaxed text-justify mt-4" data-editable="didyouknow_text">Par exemple, le <strong>Myrcène</strong> (dominant dans la OG Kush ou un Hash Afghan) ancre la relaxation physique, tandis que le <strong>Limonène</strong> (typique de la Super Lemon Haze) booste l'énergie et l'humeur. Le <strong>Caryophyllène</strong> (Girl Scout Cookies) apporte, lui, un apaisement anti-stress. Cette synergie crée une expérience bien plus riche et nuancée que la puissance brute isolée.</p></div>
+                <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg"><h2 class="section-title" data-editable="potency_title">Échelle de Puissance</h2>
+				<p class="text-slate-600 mb-4 text-sm text-justify" data-editable="potency_desc">Comparatif des taux moyens de THC observés en laboratoire.</p><div class="chart-container"><canvas id="potencyChart"></canvas></div></div>
+                <div class="lg:col-span-1 bg-emerald-50 border-l-4 border-emerald-500 p-6 rounded-r-xl">
+				<h4 class="font-bold text-emerald-900 text-lg mb-2" data-editable="didyouknow_title">Le Mythe du THC</h4>
+				<p class="text-sm text-emerald-800 leading-relaxed text-justify" data-editable="didyouknow_text">Attention : un taux de THC élevé (80%+) ne garantit pas une expérience "meilleure". C'est l'<strong>Effet d'Entourage</strong> qui compte : la synergie complexe entre les cannabinoïdes et les terpènes.</p>
+				<p class="text-sm text-emerald-800 leading-relaxed text-justify mt-4" data-editable="didyouknow_text">Par exemple, le <strong>Myrcène</strong> (dominant dans la OG Kush ou un Hash Afghan) ancre la relaxation physique, tandis que le <strong>Limonène</strong> (typique de la Super Lemon Haze) booste l'énergie et l'humeur. Le <strong>Caryophyllène</strong> (Girl Scout Cookies) apporte, lui, un apaisement anti-stress. Cette synergie crée une expérience bien plus riche et nuancée que la puissance brute isolée.</p></div>
             </section>
 
             <!-- COMPARATOR & MATRIX -->
@@ -197,21 +240,28 @@
             <section class="bg-slate-900 text-slate-300 p-8 rounded-xl">
                 <h2 class="section-title !text-white" data-editable="lex_title">Lexique du Connaisseur</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-sm text-justify">
-                    <div><strong class="block text-emerald-400 mb-1">Trichomes</strong><span data-editable="lex_1">Les glandes résineuses microscopiques en forme de champignon qui recouvrent la fleur. C'est l'usine chimique de la plante.</span></div>
-                    <div><strong class="block text-emerald-400 mb-1">Terpènes</strong><span data-editable="lex_2">Composés aromatiques volatils (Limonène, Pinène...). Ils définissent l'odeur et orientent l'effet (sédatif ou stimulant).</span></div>
-                    <div><strong class="block text-emerald-400 mb-1">Full Melt</strong><span data-editable="lex_3">Un gage de pureté extrême pour un hash (souvent Water Hash) qui fond totalement à la chaleur sans laisser aucun résidu (6 étoiles).</span></div>
-                    <div><strong class="block text-emerald-400 mb-1">Solventless</strong><span data-editable="lex_4">Méthodes d'extraction mécaniques utilisant uniquement l'eau, la glace, la chaleur et la pression. Aucune chimie.</span></div>
-                    <div><strong class="block text-emerald-400 mb-1">Fresh Frozen</strong><span data-editable="lex_5">Plante congelée immédiatement après récolte (sans séchage) pour préserver les terpènes volatils "vivants" (Live Resin/Rosin).</span></div>
+                    <div><strong class="block text-emerald-400 mb-1">Trichomes</strong><span data-editable="lex_1">Ce sont des glandes résineuses microscopiques en forme de champignon qui recouvrent la fleur. C'est l'usine chimique de la plante.</span></div>
+                    <div><strong class="block text-emerald-400 mb-1">Terpènes</strong><span data-editable="lex_2">Des composés aromatiques volatils (Limonène, Pinène...). Ils définissent l'odeur et orientent l'effet (sédatif ou stimulant).</span></div>
+                    <div><strong class="block text-emerald-400 mb-1">Full Melt</strong><span data-editable="lex_3">C'est un gage de pureté extrême pour un hash (souvent Water Hash) qui fond totalement à la chaleur sans laisser aucun résidu (6 étoiles).</span></div>
+                    <div><strong class="block text-emerald-400 mb-1">Solventless</strong><span data-editable="lex_4">C'est une méthodes d'extraction mécaniques utilisant uniquement l'eau, la glace, la chaleur et la pression. Il n'y a aucune chimie.</span></div>
+                    <div><strong class="block text-emerald-400 mb-1">Fresh Frozen</strong><span data-editable="lex_5">Technique consistant à surgeler la matière végétale (fleurs ou simple manucure) immédiatement après la récolte, sans séchage, pour figer les terpènes volatils avant toute oxydation. C'est la base des produits dits "Live".</span></div>
                     <div><strong class="block text-emerald-400 mb-1">WPFF (Whole Plant)</strong><span data-editable="lex_6">Acronyme de "Whole Plant Fresh Frozen". Désigne le summum de la qualité : contrairement au Fresh Frozen standard, on congèle ici la plante entière (avec ses meilleures fleurs) et non juste les restes de taille.</span></div>
-                    <div><strong class="block text-emerald-400 mb-1">Curing</strong><span data-editable="lex_7">Processus d'affinage lent en bocal hermétique. Crucial pour stabiliser l'humidité et développer la complexité aromatique.</span></div>
-                    <div><strong class="block text-emerald-400 mb-1">Pheno Hunting</strong><span data-editable="lex_8">L'art de sélectionner la meilleure plante (le meilleur phénotype) parmi des centaines de graines d'une même variété.</span></div>
-                    <div><strong class="block text-emerald-400 mb-1">Wash</strong><span data-editable="lex_9">Action de laver la matière végétale dans de l'eau glacée pour en détacher les trichomes (pour faire du Bubble Hash).</span></div>
+                    <div><strong class="block text-emerald-400 mb-1">Curing</strong><span data-editable="lex_7">C'est un processus d'affinage lent en bocal hermétique. Il est crucial pour stabiliser l'humidité et développer la complexité aromatique.</span></div>
+                    <div><strong class="block text-emerald-400 mb-1">Pheno Hunting</strong><span data-editable="lex_8">Designe l'art de sélectionner la meilleure plante (le meilleur phénotype) parmi des centaines de graines d'une même variété.</span></div>
+                    <div><strong class="block text-emerald-400 mb-1">Wash</strong><span data-editable="lex_9">C'est l'action de laver la matière végétale dans de l'eau glacée pour en détacher les trichomes (pour faire du Bubble Hash).</span></div>
                 </div>
             </section>
 
             <!-- DYNAMIC SECTIONS -->
             <div id="custom-sections-container" class="space-y-16"></div>
-            <div id="add-section-area" class="hidden text-center py-10 border-t-2 border-dashed border-slate-300 mt-12"><button onclick="openSectionModal()" class="bg-amber-500 hover:bg-amber-600 text-white px-8 py-4 rounded-full font-bold shadow-lg transition transform hover:scale-105 mx-auto">+ Ajouter une Section</button></div>
+			
+            <!-- ADD SECTION BUTTON -->
+            <div id="add-section-area" class="hidden text-center py-10 border-t-2 border-dashed border-slate-300 mt-12">
+                <p class="text-slate-400 mb-4 text-sm font-bold uppercase tracking-widest">Zone de Personnalisation</p>
+                <button onclick="openSectionModal()" class="bg-amber-500 hover:bg-amber-600 text-white px-8 py-4 rounded-full font-bold shadow-lg transition transform hover:scale-105 mx-auto">
+                    + Ajouter une Section
+                </button>
+            </div>
         </div>
 
         <!-- ==================== VIEW: DETAIL ==================== -->
@@ -223,9 +273,9 @@
             <section class="grid grid-cols-1 lg:grid-cols-2 gap-8"><div class="bg-white p-6 rounded-xl shadow-md"><div class="chart-container"><canvas id="detailRadarChart"></canvas></div></div><div class="bg-white p-6 rounded-xl shadow-md"><div class="chart-container"><canvas id="detailBarChart"></canvas></div></div></section>
         </div>
 
-        <!-- ==================== VIEW: COLLECTION (MODIFIÉ: BARRE AMIS AJOUTÉE ICI) ==================== -->
+        <!-- ==================== VIEW: COLLECTION ==================== -->
         <div id="view-collection" class="hidden fade-in pb-20">
-            <!-- BARRE AMIS -->
+            <!-- BARRE AMIS CORRIGÉE (MARGE NÉGATIVE ET BACKGROUND BLANC) -->
             <div class="-mt-4 -mx-4 md:-mt-8 md:-mx-8 mb-6 flex items-center justify-between border-b border-slate-200 pb-4 bg-white p-4 shadow-sm md:rounded-b-xl z-20 relative">
                 <span class="text-xs font-bold text-emerald-500 uppercase tracking-widest flex items-center gap-2"><span>👥</span> Collaboratif</span>
                 <div id="friends-list" class="flex items-center gap-2">
@@ -244,7 +294,7 @@
 
         <!-- ==================== VIEW: FRIEND PORTFOLIO ==================== -->
         <div id="view-friend" class="hidden fade-in pb-20">
-            <!-- Header Ami (Collé en haut) -->
+            <!-- Header Ami (Collé en haut avec marges négatives) -->
             <div class="-mt-4 -mx-4 md:-mt-8 md:-mx-8 bg-blue-600 text-white p-6 shadow-lg mb-6 md:rounded-b-2xl">
                 <h2 class="text-3xl font-bold mb-2">Portfolio de <span id="friend-view-name">Ami</span></h2>
                 <p class="text-blue-200 text-sm">Mode lecture seule.</p>
@@ -393,7 +443,13 @@
             </div>
             <div class="p-6 overflow-y-auto">
                 <div class="flex justify-between items-start mb-4">
-                    <div><h2 id="fd-strain" class="text-3xl font-black text-slate-800 leading-tight">Strain</h2><p id="fd-commercial" class="text-emerald-600 font-bold uppercase text-sm tracking-wider mt-1">Commercial</p></div>
+                    <div>
+                        <h2 id="fd-strain" class="text-3xl font-black text-slate-800 leading-tight">Strain</h2>
+                        <p class="text-emerald-600 font-bold uppercase text-sm tracking-wider mt-1">
+                            <span id="fd-commercial">Commercial</span>
+                            <span id="fd-hash-badge" class="hidden ml-2 bg-amber-100 text-amber-700 px-2 py-0.5 rounded text-xs border border-amber-200"></span>
+                        </p>
+                    </div>
                     <div class="text-5xl" id="fd-flag">🏳️</div>
                 </div>
                 <div class="grid grid-cols-2 gap-4 mb-6">
@@ -409,9 +465,9 @@
                 </div>
 
                 <div class="space-y-3 text-sm text-slate-600 mb-8 bg-white rounded-xl">
-                    <div class="flex justify-between border-b border-slate-100 pb-2 hidden" id="fd-hash-row">
-                        <span>Technique Hash</span>
-                        <span id="fd-hash-type" class="font-bold text-amber-600">-</span>
+                     <div class="flex justify-between border-b border-slate-100 pb-2">
+                        <span>Producteur / Farm</span>
+                        <span id="fd-farm" class="font-bold text-slate-800">Unknown</span>
                     </div>
                 </div>
             </div>
@@ -420,9 +476,7 @@
 
 
     <script>
-        // ============================================================
-        // 💾 INDEXEDDB MANAGER (DATABASE)
-        // ============================================================
+        // --- DATABASE ---
         const DB_NAME = 'GreenCodexDB';
         const DB_VERSION = 1;
         const db = {
@@ -433,41 +487,18 @@
             delete: function(storeName, key) { return new Promise((resolve) => { const tx = this.instance.transaction(storeName, 'readwrite'); const store = tx.objectStore(storeName); store.delete(key); tx.oncomplete = () => resolve(); }); }
         };
 
-        // ============================================================
-        // ⚠️ CONFIGURATION GITHUB ⚠️
-        // ============================================================
+        // --- CONFIG ---
         const GITHUB_USERNAME = 'antoto2021'; 
         const GITHUB_REPO     = 'Appli-Portfolio-test-collab';        
         const UPDATE_STORAGE_KEY = 'green_codex_last_hash';
         const UPDATE_TIME_KEY    = 'green_codex_update_timestamp';
-
-        let firebaseInstance = null; // Store { db, user, appId }
-        let myUid = null;
-
-        // --- GLOBAL VARIABLES ---
-        let collection = [];
-        let contentMap = {};
-        let customSections = [];
-        let friends = [];
-        let isEditMode = false;
-        let currentPhotos = [];
-        let currentSectionImage = null;
+        let firebaseInstance = null, myUid = null;
+        let collection = [], contentMap = {}, customSections = [], friends = [], currentFriendItems = [];
+        let isEditMode = false, currentPhotos = [], currentSectionImage = null;
         let activeUpdates = [{ icon: "🚀", title: "Mise à jour", desc: "Nouvelle version disponible." }];
         let currentSlide = 0;
 
-        const masterData = { 
-            hash_dry: { name: "Dry Sift", color: "amber", hex: "#D97706", badge: "Tradition", icon: "🏜️", desc: "Tamisage mécanique ancestral.", process: [{t:"Séchage",d:"Plante affinée"},{t:"Tamisage",d:"Frottement"},{t:"Collection",d:"Poudre"},{t:"Presse",d:"Chaleur"}], radar: [30,90,70,50,60], metrics: [20,50,40,30], metricsLabels: ['Rendement','Puissance','Prix','Tech'], matrix: {x:45,y:9} }, 
-            hash_water: { name: "Ice-O-Lator", color: "blue", hex: "#2563EB", badge: "Pureté", icon: "❄️", desc: "Extraction eau glacée + Fresh Frozen.", process: [{t:"Congélation",d:"-40°C"},{t:"Lavage",d:"Eau+Glace"},{t:"Filtre",d:"Sacs"},{t:"Séchage",d:"Lyophilisation"}], radar: [90,30,60,95,85], metrics: [10,75,90,80], metricsLabels: ['Rendement','Puissance','Prix','Tech'], matrix: {x:70,y:6} }, 
-            hash_rosin: { name: "Rosin", color: "purple", hex: "#9333EA", badge: "Excellence", icon: "🔥", desc: "Pression et chaleur uniquement.", process: [{t:"Matériel",d:"Hash 6*"},{t:"Sac",d:"25u Nylon"},{t:"Presse",d:"Hydraulique"},{t:"Cure",d:"Cold Cure"}], radar: [85,50,80,90,95], metrics: [15,85,100,60], metricsLabels: ['Rendement','Puissance','Prix','Tech'], matrix: {x:85,y:3} }, 
-            
-            // --- NOUVEAUX PRODUITS AJOUTÉS ---
-            hash_wpff: { name: "WPFF (Live Rosin)", color: "cyan", hex: "#06b6d4", badge: "Summum", icon: "💎", desc: "Whole Plant Fresh Frozen. Plante entière congelée vivante pour une extraction Rosin d'une richesse terpénique inégalée.", process: [{t:"Récolte",d:"Top Buds"},{t:"Surgélation",d:"Immédiat"},{t:"Lavage",d:"Ice Water"},{t:"Presse",d:"Low Temp"}], radar: [95, 20, 70, 100, 90], metrics: [8, 80, 100, 95], metricsLabels: ['Rendement','Puissance','Prix','Tech'], matrix: {x: 95, y: 2} },
-            hash_bho: { name: "BHO (Shatter/Wax)", color: "slate", hex: "#64748B", badge: "Solvant", icon: "🍯", desc: "Extraction par solvant (Butane). Très puissant, texture variée (verre ou cire).", process: [{t:"Tube",d:"Plante"},{t:"Injection",d:"Butane"},{t:"Purge",d:"Vide d'air"},{t:"Finition",d:"Shatter"}], radar: [70, 40, 80, 60, 95], metrics: [18, 90, 60, 70], metricsLabels: ['Rendement','Puissance','Prix','Tech'], matrix: {x: 80, y: 8} },
-            
-            weed_indica: { name: "Indica (Kush)", color: "indigo", hex: "#4F46E5", badge: "Relax", icon: "🏔️", desc: "Montagnes, effet lourd.", process: [{t:"Origine",d:"Hindu Kush"},{t:"Structure",d:"Buisson"},{t:"Flo",d:"8 sem"},{t:"Effet",d:"Physique"}], radar: [20,80,90,60,40], metrics: [80,22,50,90], metricsLabels: ['Rendement','THC','Taille','Facilité'], matrix: {x:20,y:10} }, 
-            weed_sativa: { name: "Sativa (Haze)", color: "yellow", hex: "#D97706", badge: "Energie", icon: "☀️", desc: "Tropiques, effet high.", process: [{t:"Origine",d:"Equateur"},{t:"Structure",d:"Géante"},{t:"Flo",d:"12+ sem"},{t:"Effet",d:"Cérébral"}], radar: [60,40,20,70,40], metrics: [90,18,100,60], metricsLabels: ['Rendement','THC','Taille','Facilité'], matrix: {x:18,y:10} }, 
-            weed_exotic: { name: "Exotics", color: "pink", hex: "#DB2777", badge: "Hybride", icon: "🧬", desc: "Breeding US moderne.", process: [{t:"Origine",d:"Indoor"},{t:"Structure",d:"Optimisée"},{t:"Flo",d:"9 sem"},{t:"Effet",d:"Mixte"}], radar: [80,50,60,80,50], metrics: [75,28,60,70], metricsLabels: ['Rendement','THC','Taille','Facilité'], matrix: {x:28,y:10} } 
-        };
+        const masterData = { hash_dry: { name: "Dry Sift", color: "amber", hex: "#D97706", badge: "Tradition", icon: "🏜️", desc: "Tamisage mécanique ancestral.", process: [{t:"Séchage",d:"Plante affinée"},{t:"Tamisage",d:"Frottement"},{t:"Collection",d:"Poudre"},{t:"Presse",d:"Chaleur"}], radar: [30,90,70,50,60], metrics: [20,50,40,30], metricsLabels: ['Rendement','Puissance','Prix','Tech'], matrix: {x:45,y:9} }, hash_water: { name: "Ice-O-Lator", color: "blue", hex: "#2563EB", badge: "Pureté", icon: "❄️", desc: "Extraction eau glacée + Fresh Frozen.", process: [{t:"Congélation",d:"-40°C"},{t:"Lavage",d:"Eau+Glace"},{t:"Filtre",d:"Sacs"},{t:"Séchage",d:"Lyophilisation"}], radar: [90,30,60,95,85], metrics: [10,75,90,80], metricsLabels: ['Rendement','Puissance','Prix','Tech'], matrix: {x:70,y:6} }, hash_rosin: { name: "Rosin", color: "purple", hex: "#9333EA", badge: "Excellence", icon: "🔥", desc: "Pression et chaleur uniquement.", process: [{t:"Matériel",d:"Hash 6*"},{t:"Sac",d:"25u Nylon"},{t:"Presse",d:"Hydraulique"},{t:"Cure",d:"Cold Cure"}], radar: [85,50,80,90,95], metrics: [15,85,100,60], metricsLabels: ['Rendement','Puissance','Prix','Tech'], matrix: {x:85,y:3} }, weed_indica: { name: "Indica (Kush)", color: "indigo", hex: "#4F46E5", badge: "Relax", icon: "🏔️", desc: "Montagnes, effet lourd.", process: [{t:"Origine",d:"Hindu Kush"},{t:"Structure",d:"Buisson"},{t:"Flo",d:"8 sem"},{t:"Effet",d:"Physique"}], radar: [20,80,90,60,40], metrics: [80,22,50,90], metricsLabels: ['Rendement','THC','Taille','Facilité'], matrix: {x:20,y:10} }, weed_sativa: { name: "Sativa (Haze)", color: "yellow", hex: "#D97706", badge: "Energie", icon: "☀️", desc: "Tropiques, effet high.", process: [{t:"Origine",d:"Equateur"},{t:"Structure",d:"Géante"},{t:"Flo",d:"12+ sem"},{t:"Effet",d:"Cérébral"}], radar: [60,40,20,70,40], metrics: [90,18,100,60], metricsLabels: ['Rendement','THC','Taille','Facilité'], matrix: {x:18,y:10} }, weed_exotic: { name: "Exotics", color: "pink", hex: "#DB2777", badge: "Hybride", icon: "🧬", desc: "Breeding US moderne.", process: [{t:"Origine",d:"Indoor"},{t:"Structure",d:"Optimisée"},{t:"Flo",d:"9 sem"},{t:"Effet",d:"Mixte"}], radar: [80,50,60,80,50], metrics: [75,28,60,70], metricsLabels: ['Rendement','THC','Taille','Facilité'], matrix: {x:28,y:10} } };
 
         const tutorialSlides = [
             { icon: "👋", title: "Bienvenue !", desc: "Découvrez Green Codex, votre encyclopédie cannabique interactive et personnelle." },
@@ -478,11 +509,13 @@
             { icon: "📝", title: "Détails", desc: "Indiquer la farm, la strain, la quantité et le pays d'origine pour chaque entrée." },
             { icon: "📸", title: "Photos", desc: "Immortalisez vos plus belles fleurs. Ajoutez jusqu'à 3 photos par fiche." },
             { icon: "✏️", title: "Mode Édition", desc: "C'est VOTRE appli. Activez le mode édition (en haut) pour réécrire les textes et titres." },
+			{ icon: "🤝", title: "Mode collaboratif", desc: "Ce mode vous permet de voir le portfolio de vos amis ! Ajouter leur ID dans l'onglet "Info" et partager vos découvertes." },
+			{ icon: "🔒", title: "Sécurité", desc: "Seulement les textes sont visible dans l'onglet collaboratif (stocké dans le cloud), personne n'a accès a vos photos (stocké uniquement sur VOTRE téléphone." }, 
             { icon: "🔄", title: "Mises à jour", desc: "Connectée à GitHub, l'appli évolue automatiquement. Vos données restent sécurisées sur votre téléphone." },
             { icon: "🚀", title: "C'est parti !", desc: "Vous êtes prêt. Commencez à explorer et à construire votre collection dès maintenant." }
         ];
-
-        // --- CORE FUNCTIONS ---
+		
+        // --- MAIN FUNCTIONS ---
         function showView(viewId) {
             document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('hidden'));
             document.getElementById(`view-${viewId}`).classList.remove('hidden');
@@ -497,43 +530,36 @@
 
         async function initApp() {
             try {
-                // 1. DB LOCAL
                 await db.init();
+                // Migration Logic
+                const legacyCol = localStorage.getItem('green_codex_collection_v4');
+                if(legacyCol) { const p = JSON.parse(legacyCol); if(p.length > 0) { for(let i of p) { delete i.id; await db.save('collection', i); } } localStorage.removeItem('green_codex_collection_v4'); }
+                const legacyCt = localStorage.getItem('green_codex_content_v4');
+                if(legacyCt) { await db.save('config', { key: 'contentMap', value: JSON.parse(legacyCt) }); localStorage.removeItem('green_codex_content_v4'); }
+                const legacySc = localStorage.getItem('green_codex_custom_sections_v4');
+                if(legacySc) { await db.save('config', { key: 'customSections', value: JSON.parse(legacySc) }); localStorage.removeItem('green_codex_custom_sections_v4'); }
+
                 collection = await db.getAll('collection');
                 friends = await db.getAll('friends');
                 renderFriendsList();
+                const cc = (await db.getAll('config')).find(c => c.key === 'contentMap'); contentMap = cc ? cc.value : {};
+                const cs = (await db.getAll('config')).find(c => c.key === 'customSections'); customSections = cs ? cs.value : [];
+                loadSavedContent(); updateDashboardStats(); initCharts();
 
-                const contentConfig = (await db.getAll('config')).find(c => c.key === 'contentMap');
-                contentMap = contentConfig ? contentConfig.value : {};
-                const sectionsConfig = (await db.getAll('config')).find(c => c.key === 'customSections');
-                customSections = sectionsConfig ? sectionsConfig.value : [];
-
-                loadSavedContent();
-                updateDashboardStats();
-                initCharts();
-
-                // 2. FIREBASE (SYNC TEXT)
                 if (window.initFirebase) {
                     firebaseInstance = await window.initFirebase();
                     if (firebaseInstance) {
                         myUid = firebaseInstance.user.uid;
-                        console.log("Firebase Connected. UID:", myUid);
-                        // Save UID locally for persistence
                         await db.save('config', { key: 'user_uid', value: myUid });
                     } else {
-                        // Try to recover UID from local DB if offline
-                        const savedUid = (await db.getAll('config')).find(c => c.key === 'user_uid');
-                        if(savedUid) myUid = savedUid.value;
+                        const su = (await db.getAll('config')).find(c => c.key === 'user_uid');
+                        if(su) myUid = su.value;
                     }
                 }
-
-                // 3. GITHUB CHECK
                 setTimeout(() => checkGitHubStatus(), 5000);
-
             } catch(e) { console.error("Init Error:", e); }
         }
 
-        // --- COLLECTION LOGIC ---
         async function saveCollectionItem(item) {
             try {
                 const id = await db.save('collection', item);
@@ -541,32 +567,22 @@
                 collection = await db.getAll('collection');
                 updateDashboardStats();
                 renderCollectionList();
-                
-                // Sync to Cloud (Sans photos)
                 if(window.firebaseFuncs && firebaseInstance) {
-                    try {
-                        const { setDoc, doc } = window.firebaseFuncs;
-                        const { db: firestore, appId } = firebaseInstance;
-                        const cleanItem = { ...item, photos: [] }; // Strip photos for sync
-                        // NOTE: We do NOT sync the friends list. It remains local.
-                        await setDoc(doc(firestore, 'artifacts', appId, 'users', myUid, 'portfolio', id.toString()), cleanItem);
-                    } catch(e) { console.error("Sync Error", e); }
+                    const { setDoc, doc } = window.firebaseFuncs;
+                    const { db: firestore, appId } = firebaseInstance;
+                    const cleanItem = { ...item, photos: [] }; 
+                    await setDoc(doc(firestore, 'artifacts', appId, 'users', myUid, 'portfolio', id.toString()), cleanItem);
                 }
-            } catch (e) {
-                console.error("Save Error:", e);
-                alert("Erreur lors de la sauvegarde locale.");
-            }
+            } catch (e) { console.error("Save Error:", e); alert("Erreur sauvegarde."); }
         }
 
         async function deleteCollectionItem(id) {
-            if(confirm('Supprimer cette entrée ?')) {
+            if(confirm('Supprimer ?')) {
                 await db.delete('collection', id);
                 collection = await db.getAll('collection');
                 updateDashboardStats();
                 renderCollectionList();
                 closeCollectionDetail();
-                
-                // Delete from Cloud
                 if(window.firebaseFuncs && firebaseInstance) {
                     try {
                         const { deleteDoc, doc } = window.firebaseFuncs;
@@ -577,15 +593,12 @@
             }
         }
 
-        // --- FRIENDS LOGIC (LOCAL ONLY) ---
         async function promptAddFriend() {
-            const friendId = prompt("Entrez l'ID Unique de votre ami (disponible dans l'onglet Info de son appli) :");
-            if (friendId && friendId.length > 5) {
-                const name = prompt("Donnez un petit nom à cet ami (ex: Toto) :");
-                const initial = (name || "A").charAt(0).toUpperCase();
-                
-                const friend = { id: friendId, name: name || "Ami", initial: initial };
-                await db.save('friends', friend);
+            const fid = prompt("Entrez l'ID Unique de votre ami :");
+            if (fid && fid.length > 5) {
+                const name = prompt("Nom de l'ami :") || "Ami";
+                const initial = name.charAt(0).toUpperCase();
+                await db.save('friends', { id: fid, name: name, initial: initial });
                 friends = await db.getAll('friends');
                 renderFriendsList();
             }
@@ -595,131 +608,95 @@
             const container = document.getElementById('friends-list');
             const addBtn = container.querySelector('.add-btn');
             container.innerHTML = '';
-            
             friends.forEach(f => {
                 const el = document.createElement('div');
                 el.className = 'friend-avatar bg-blue-500 hover:bg-blue-600 border-2 border-white text-white shadow-sm';
-                el.innerText = f.initial;
-                el.title = f.name;
-                el.onclick = () => viewFriendPortfolio(f);
+                el.innerText = f.initial; el.title = f.name; el.onclick = () => viewFriendPortfolio(f);
                 container.appendChild(el);
             });
             container.appendChild(addBtn);
         }
 
         async function viewFriendPortfolio(friend) {
-            if (!firebaseInstance || !window.firebaseFuncs) {
-                alert("Connexion Cloud nécessaire pour voir les amis.");
-                return;
-            }
-            
+            if (!firebaseInstance || !window.firebaseFuncs) { alert("Connexion Cloud nécessaire."); return; }
             showView('friend');
             document.getElementById('friend-view-name').innerText = friend.name;
-            document.getElementById('friend-collection-list').innerHTML = '<div class="col-span-full text-center py-10"><div class="wn-loader"></div><p class="mt-4 text-slate-500">Récupération du portfolio...</p></div>';
+            document.getElementById('friend-collection-list').innerHTML = '<div class="col-span-full text-center py-10"><div class="wn-loader"></div></div>';
             document.getElementById('friend-empty-state').classList.add('hidden');
-
             try {
                 const { getDocs, collection: fsCol } = window.firebaseFuncs;
                 const { db: firestore, appId } = firebaseInstance;
-                
                 const snapshot = await getDocs(fsCol(firestore, 'artifacts', appId, 'users', friend.id, 'portfolio'));
-                const friendItems = [];
-                snapshot.forEach(doc => friendItems.push(doc.data()));
-                
-                renderFriendCollection(friendItems);
-            } catch (e) {
-                console.error(e);
-                alert("Impossible de charger ce portfolio. L'ID est peut-être incorrect.");
-                showView('home');
-            }
+                const items = []; snapshot.forEach(d => items.push(d.data()));
+                currentFriendItems = items; // Store items for detail view
+                renderFriendCollection(items);
+            } catch (e) { alert("Impossible de charger."); showView('home'); }
         }
 
         function renderFriendCollection(items) {
-            const container = document.getElementById('friend-collection-list');
-            container.innerHTML = '';
-            
-            if (items.length === 0) {
-                document.getElementById('friend-empty-state').classList.remove('hidden');
-                return;
-            }
-
+            const c = document.getElementById('friend-collection-list'); c.innerHTML = '';
+            if (items.length === 0) { document.getElementById('friend-empty-state').classList.remove('hidden'); return; }
             items.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-            items.forEach(item => {
-                const html = `
-                <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 flex gap-4 opacity-90">
-                    <div class="w-20 h-20 rounded-lg bg-slate-100 flex-shrink-0 flex items-center justify-center text-3xl opacity-50">
-                        ${item.category === 'hash' ? '🍫' : '🥦'}
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex justify-between items-start">
-                            <h3 class="font-bold text-slate-800 truncate pr-2">${item.strain}</h3>
-                            <span class="text-xl">${getFlag(item.country)}</span>
-                        </div>
-                        <p class="text-xs text-slate-500 font-bold uppercase mb-1">${item.commercialName || 'Inconnu'}</p>
-                        ${item.type ? `<span class="bg-amber-100 text-amber-800 text-[10px] px-1.5 py-0.5 rounded border border-amber-200 block w-fit mb-1">${item.type}</span>` : ''}
-                        <div class="flex items-center gap-2 mt-2">
-                             <span class="bg-emerald-50 text-emerald-700 text-xs px-2 py-1 rounded font-bold">${item.quantity}g</span>
-                             <span class="text-[10px] text-slate-400 ml-auto">${new Date(item.date).toLocaleDateString()}</span>
-                        </div>
-                        ${item.observation ? `<p class="mt-2 text-xs text-slate-600 italic border-t pt-1 truncate">"${item.observation}"</p>` : ''}
-                    </div>
-                </div>`;
-                container.insertAdjacentHTML('beforeend', html);
+            items.forEach((i, index) => {
+                const h = `<div onclick="openFriendDetail(${index})" class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 flex gap-4 opacity-90 cursor-pointer hover:shadow-md transition"><div class="w-20 h-20 rounded-lg bg-slate-100 flex-shrink-0 flex items-center justify-center text-3xl opacity-50">${i.category === 'hash' ? '🍫' : '🥦'}</div><div class="flex-1 min-w-0"><div class="flex justify-between items-start"><h3 class="font-bold text-slate-800 truncate pr-2">${i.strain}</h3><span class="text-xl">${getFlag(i.country)}</span></div><p class="text-xs text-slate-500 font-bold uppercase mb-1">${i.commercialName || 'Inconnu'}</p>${i.type ? `<span class="bg-amber-100 text-amber-800 text-[10px] px-1.5 py-0.5 rounded border border-amber-200 block w-fit mb-1">${i.type}</span>` : ''}<div class="flex items-center gap-2 mt-2"><span class="bg-emerald-50 text-emerald-700 text-xs px-2 py-1 rounded font-bold">${i.quantity}g</span><span class="text-[10px] text-slate-400 ml-auto">${new Date(i.date).toLocaleDateString()}</span></div>${i.observation ? `<p class="mt-2 text-xs text-slate-600 italic border-t pt-1 truncate">"${i.observation}"</p>` : ''}</div></div>`;
+                c.insertAdjacentHTML('beforeend', h);
             });
         }
+        
+        function openFriendDetail(index) {
+            const item = currentFriendItems[index];
+            if(!item) return;
 
-        // --- UTILS ---
+            document.getElementById('fd-strain').innerText = item.strain;
+            document.getElementById('fd-commercial').innerText = item.commercialName || item.farm || 'Sans nom';
+            
+            if(item.category === 'hash' && item.type) {
+                const badge = document.getElementById('fd-hash-badge');
+                badge.innerText = item.type;
+                badge.classList.remove('hidden');
+            } else {
+                document.getElementById('fd-hash-badge').classList.add('hidden');
+            }
+
+            document.getElementById('fd-flag').innerText = getFlag(item.country);
+            document.getElementById('fd-quantity').innerText = item.quantity + 'g';
+            document.getElementById('fd-price').innerText = item.price + '€';
+            document.getElementById('fd-category').innerText = item.category === 'hash' ? 'Hash 🍫' : 'Weed 🥦';
+            document.getElementById('fd-date').innerText = new Date(item.date).toLocaleDateString();
+            
+            if(item.observation){
+                document.getElementById('fd-observation').innerText = item.observation;
+                document.getElementById('fd-observation-container').classList.remove('hidden');
+            } else {
+                document.getElementById('fd-observation-container').classList.add('hidden');
+            }
+            
+            document.getElementById('fd-farm').innerText = item.farm || 'Inconnu';
+
+            document.getElementById('friend-detail-modal').classList.remove('hidden');
+        }
+
+        function closeFriendDetail() {
+            document.getElementById('friend-detail-modal').classList.add('hidden');
+        }
+
+
+        // --- UTILS & HELPERS ---
         function compressImage(f,w=1200,q=0.8){return new Promise(r=>{const R=new FileReader();R.onload=e=>{const i=new Image();i.onload=()=>{const c=document.createElement('canvas');let W=i.width,H=i.height;if(W>w){H*=w/W;W=w}c.width=W;c.height=H;c.getContext('2d').drawImage(i,0,0,W,H);r(c.toDataURL('image/jpeg',q))};i.src=e.target.result};R.readAsDataURL(f)})}
         function toggleEditMode(){isEditMode=!isEditMode;document.body.classList.toggle('edit-mode-active',isEditMode);document.getElementById('edit-banner').classList.toggle('hidden',!isEditMode);document.getElementById('editModeBtn').classList.toggle('bg-amber-500',isEditMode);document.getElementById('add-section-area').classList.toggle('hidden',!isEditMode);document.querySelectorAll('[data-editable]').forEach(e=>{if(isEditMode){e.classList.add('editable-highlight');e.onclick=ev=>{ev.preventDefault();ev.stopPropagation();editContent(ev.target.closest('[data-editable]'))}}else{e.classList.remove('editable-highlight');e.onclick=null}});renderCustomSections()}
         async function editContent(e){if(!isEditMode||!e)return;const k=e.getAttribute('data-editable'),t=prompt("Modifier:",e.innerText);if(t!==null&&t!==e.innerText){e.innerText=t;contentMap[k]=t;await db.save('config',{key:'contentMap',value:contentMap})}}
         function loadSavedContent(){document.querySelectorAll('[data-editable]').forEach(e=>{const k=e.getAttribute('data-editable');if(contentMap[k])e.innerText=contentMap[k]});renderCustomSections()}
-        
-        // --- STORAGE CALCULATOR (IMPROVED) ---
-        function calculateStorageUsage() {
-            // Estimation plus précise
-            const colBlob = new Blob([JSON.stringify(collection)]);
-            const contentBlob = new Blob([JSON.stringify(contentMap)]);
-            const sectBlob = new Blob([JSON.stringify(customSections)]);
-            
-            const totalBytes = colBlob.size + contentBlob.size + sectBlob.size;
-            
-            let sizeStr = "";
-            if (totalBytes < 1024) sizeStr = totalBytes + " B";
-            else if (totalBytes < 1024 * 1024) sizeStr = (totalBytes / 1024).toFixed(1) + " Ko";
-            else sizeStr = (totalBytes / (1024 * 1024)).toFixed(2) + " Mo";
-
-            const el = document.getElementById('info-storage-size');
-            if (el) el.innerText = sizeStr;
-            
-            // Update also in collection header if present
-            const el2 = document.getElementById('storage-used');
-            if(el2) el2.innerText = `(${sizeStr})`;
-        }
-
-        function updateDashboardStats(){document.getElementById('stats-total').innerText=collection.length;document.getElementById('stats-weed').innerText=collection.filter(i=>i.category==='weed').length;document.getElementById('stats-hash').innerText=collection.filter(i=>i.category==='hash').length;document.getElementById('stats-mass').innerText=collection.reduce((a,c)=>a+(parseFloat(c.quantity)||0),0).toFixed(1)+'g'; calculateStorageUsage();}
+        function calculateStorageUsage(){const s=document.getElementById('storage-used');if(s)s.innerText="(Local)"}
+        function updateDashboardStats(){document.getElementById('stats-total').innerText=collection.length;document.getElementById('stats-weed').innerText=collection.filter(i=>i.category==='weed').length;document.getElementById('stats-hash').innerText=collection.filter(i=>i.category==='hash').length;document.getElementById('stats-mass').innerText=collection.reduce((a,c)=>a+(parseFloat(c.quantity)||0),0).toFixed(1)+'g'}
         function renderCollectionList(){const c=document.getElementById('collection-list');c.innerHTML='';document.getElementById('empty-state').classList.toggle('hidden',collection.length>0);[...collection].reverse().forEach(i=>{const p=i.photos&&i.photos.length?`<img src="${i.photos[0]}" class="w-full h-full object-cover">`:`<div class="w-full h-full flex items-center justify-center text-3xl opacity-30">${i.category==='hash'?'🍫':'🥦'}</div>`;const h=`<div onclick="openCollectionDetail(${i.id})" class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 flex gap-4 relative group hover:border-emerald-300 transition cursor-pointer"><div class="w-20 h-20 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden relative">${p}</div><div class="flex-1 min-w-0"><div class="flex justify-between items-start"><h3 class="font-bold text-slate-800 truncate pr-2">${i.strain}</h3><span class="text-xl">${getFlag(i.country)}</span></div><p class="text-xs text-slate-500 font-bold uppercase mb-1">${i.commercialName||'Inconnu'}</p>${i.type?`<span class="bg-amber-100 text-amber-800 text-[10px] px-1.5 py-0.5 rounded border border-amber-200 block w-fit mb-1">${i.type}</span>`:''}<div class="flex items-center gap-2 mt-2"><span class="bg-emerald-50 text-emerald-700 text-xs px-2 py-1 rounded font-bold">${i.quantity}g</span></div></div></div>`;c.insertAdjacentHTML('beforeend',h)})}
         
-        function openCollectionForm(id=null){const f=document.getElementById('collection-form');f.reset();document.getElementById('editId').value=id||"";currentPhotos=[];const d=new Date().toISOString().split('T')[0];document.getElementById('inp-date').value=d;if(id){const i=collection.find(x=>x.id==id);if(i){document.getElementById('inp-category').value=i.category;document.getElementById('inp-quantity').value=i.quantity;document.getElementById('inp-strain').value=i.strain;document.getElementById('inp-commercialName').value=i.commercialName;document.getElementById('inp-country').value=i.country;document.getElementById('inp-price').value=i.price;if(i.type)document.getElementById('inp-hashType').value=i.type;document.getElementById('inp-observation').value=i.observation||"";
-        document.getElementById('inp-farm').value=i.farm||""; // Load Farm
-        if(i.date)document.getElementById('inp-date').value=i.date.split('T')[0];toggleFormFields(i.category);if(i.photos)currentPhotos=[...i.photos]}}else{toggleFormFields('weed')}renderPhotoPreviews();document.getElementById('collection-modal').classList.remove('hidden')}
-        async function handleCollectionSubmit(e){e.preventDefault();const f=new FormData(e.target),eid=document.getElementById('editId').value,dr=f.get('date'),do_=dr?new Date(dr+'T12:00:00'):new Date();const i={category:f.get('category'),quantity:f.get('quantity'),strain:f.get('strain'),commercialName:f.get('commercialName'),type:f.get('hashType'),country:f.get('country'),price:f.get('price'),observation:f.get('observation'),farm:f.get('farm'),photos:currentPhotos,date:do_.toISOString()};if(eid)i.id=parseInt(eid);await saveCollectionItem(i);closeCollectionForm()}
+        function openCollectionForm(id=null){const f=document.getElementById('collection-form');f.reset();document.getElementById('editId').value=id||"";currentPhotos=[];const d=new Date().toISOString().split('T')[0];document.getElementById('inp-date').value=d;if(id){const i=collection.find(x=>x.id==id);if(i){document.getElementById('inp-category').value=i.category;document.getElementById('inp-quantity').value=i.quantity;document.getElementById('inp-strain').value=i.strain;document.getElementById('inp-commercialName').value=i.commercialName;document.getElementById('inp-country').value=i.country;document.getElementById('inp-price').value=i.price;if(i.type)document.getElementById('inp-hashType').value=i.type;document.getElementById('inp-observation').value=i.observation||"";if(i.date)document.getElementById('inp-date').value=i.date.split('T')[0];toggleFormFields(i.category);if(i.photos)currentPhotos=[...i.photos]}}else{toggleFormFields('weed')}renderPhotoPreviews();document.getElementById('collection-modal').classList.remove('hidden')}
+        async function handleCollectionSubmit(e){e.preventDefault();const f=new FormData(e.target),eid=document.getElementById('editId').value,dr=f.get('date'),do_=dr?new Date(dr+'T12:00:00'):new Date();const i={category:f.get('category'),quantity:f.get('quantity'),strain:f.get('strain'),commercialName:f.get('commercialName'),type:f.get('hashType'),country:f.get('country'),price:f.get('price'),observation:f.get('observation'),photos:currentPhotos,date:do_.toISOString()};if(eid)i.id=parseInt(eid);await saveCollectionItem(i);closeCollectionForm()}
         function closeCollectionForm(){document.getElementById('collection-modal').classList.add('hidden')}
         async function handlePhotos(i){if(i.files){for(const f of i.files){try{currentPhotos.push(await compressImage(f,1200,0.8))}catch{}}renderPhotoPreviews()}}
         function renderPhotoPreviews(){document.getElementById('photo-preview-list').innerHTML=currentPhotos.map((s,i)=>`<div class="w-20 h-20 rounded-xl relative overflow-hidden group flex-shrink-0"><img src="${s}" class="w-full h-full object-cover"><button type="button" onclick="currentPhotos.splice(${i},1);renderPhotoPreviews()" class="absolute top-0 right-0 bg-red-500 text-white text-xs p-1 opacity-0 group-hover:opacity-100">X</button></div>`).join('')}
         
-        function openCollectionDetail(id){const i=collection.find(x=>x.id==id);if(!i)return;document.getElementById('cd-strain').innerText=i.strain;
-        document.getElementById('cd-commercial').innerText=i.commercialName||'Sans nom';
-        if(i.category === 'hash' && i.type) {
-            const badge = document.getElementById('cd-hash-badge');
-            badge.innerText = i.type;
-            badge.classList.remove('hidden');
-        } else {
-            document.getElementById('cd-hash-badge').classList.add('hidden');
-        }
-        document.getElementById('cd-flag').innerText=getFlag(i.country);document.getElementById('cd-quantity').innerText=i.quantity+'g';document.getElementById('cd-price').innerText=i.price+'€';document.getElementById('cd-category').innerText=i.category==='hash'?'Hash 🍫':'Weed 🥦';document.getElementById('cd-date').innerText=new Date(i.date).toLocaleDateString();if(i.observation){document.getElementById('cd-observation').innerText=i.observation;document.getElementById('cd-observation-container').classList.remove('hidden')}else{document.getElementById('cd-observation-container').classList.add('hidden')}
-        document.getElementById('cd-farm').innerText = i.farm || 'Inconnu';
-        document.getElementById('cd-btn-edit').onclick=()=>{closeCollectionDetail();openCollectionForm(id)};document.getElementById('cd-btn-delete').onclick=()=>{deleteCollectionItem(id)};const m=document.getElementById('cd-main-img'),t=document.getElementById('cd-thumbs');t.innerHTML='';if(i.photos&&i.photos.length>0){m.src=i.photos[0];m.classList.remove('opacity-30','p-10');if(i.photos.length>1){i.photos.forEach(s=>{const el=document.createElement('img');el.src=s;el.className="w-12 h-12 rounded-lg border-2 border-white/50 cursor-pointer object-cover";el.onclick=()=>m.src=s;t.appendChild(el)})}}else{m.src=""}document.getElementById('collection-detail-modal').classList.remove('hidden')}
+        function openCollectionDetail(id){const i=collection.find(x=>x.id==id);if(!i)return;document.getElementById('cd-strain').innerText=i.strain;document.getElementById('cd-commercial').innerText=i.commercialName||'Sans nom';document.getElementById('cd-flag').innerText=getFlag(i.country);document.getElementById('cd-quantity').innerText=i.quantity+'g';document.getElementById('cd-price').innerText=i.price+'€';document.getElementById('cd-category').innerText=i.category==='hash'?'Hash 🍫':'Weed 🥦';document.getElementById('cd-date').innerText=new Date(i.date).toLocaleDateString();if(i.observation){document.getElementById('cd-observation').innerText=i.observation;document.getElementById('cd-observation-container').classList.remove('hidden')}else{document.getElementById('cd-observation-container').classList.add('hidden')}document.getElementById('cd-btn-edit').onclick=()=>{closeCollectionDetail();openCollectionForm(id)};document.getElementById('cd-btn-delete').onclick=()=>{deleteCollectionItem(id)};const m=document.getElementById('cd-main-img'),t=document.getElementById('cd-thumbs');t.innerHTML='';if(i.photos&&i.photos.length>0){m.src=i.photos[0];m.classList.remove('opacity-30','p-10');if(i.photos.length>1){i.photos.forEach(s=>{const el=document.createElement('img');el.src=s;el.className="w-12 h-12 rounded-lg border-2 border-white/50 cursor-pointer object-cover";el.onclick=()=>m.src=s;t.appendChild(el)})}}else{m.src=""}document.getElementById('collection-detail-modal').classList.remove('hidden')}
         function closeCollectionDetail(){document.getElementById('collection-detail-modal').classList.add('hidden')}
         function openSectionModal(id=null){document.getElementById('section-form').reset();document.getElementById('sec-current-image').classList.add('hidden');currentSectionImage=null;if(id){const s=customSections.find(x=>x.id===id);document.getElementById('sec-id').value=s.id;document.getElementById('sec-title').value=s.title;document.getElementById('sec-text').value=s.text;if(s.image){currentSectionImage=s.image;document.querySelector('#sec-current-image img').src=s.image;document.getElementById('sec-current-image').classList.remove('hidden')}}document.getElementById('section-modal').classList.remove('hidden')}
         function closeSectionModal(){document.getElementById('section-modal').classList.add('hidden')}
@@ -739,10 +716,6 @@
         function openTutorial(){activeUpdates=tutorialSlides;currentSlide=0;const b=document.getElementById('wn-badge-text');b.innerText="Tutoriel";b.style.backgroundColor="#F59E0B";b.style.color="#fff";document.getElementById('wn-main-title').innerText="Guide";const o=document.getElementById('wn-overlay');o.style.display='flex';setTimeout(()=>o.classList.add('show-modal'),10);renderSlides();updateSlideUI();document.getElementById('wn-btn').style.display='flex'}
         function toggleSection(id){const e=document.getElementById(id);if(e)e.classList.toggle('expanded')}
         async function renderInfoView(){const lh=localStorage.getItem(UPDATE_STORAGE_KEY)||'Aucun';document.getElementById('info-local-hash').innerText=lh.substring(0,7)+'...';const lt=localStorage.getItem(UPDATE_TIME_KEY);if(lt){const d=Math.floor((Date.now()-parseInt(lt))/60000);document.getElementById('info-local-date').innerText=`Il y a ${d} min`}const sd=document.getElementById('connection-status'),re=document.getElementById('info-remote-hash');re.innerText="...";sd.className="w-2 h-2 rounded-full bg-gray-400";const rc=await fetchLatestCommit();if(rc){re.innerText=rc.sha.substring(0,7)+'...';sd.classList.remove('bg-gray-400');sd.classList.add('bg-green-500')}else{re.innerText="Offline";sd.classList.remove('bg-gray-400');sd.classList.add('bg-red-500')}if(myUid)document.getElementById('my-uid-display').innerText=myUid}
-        
-        function copyToClipboard(){const t=document.getElementById('my-uid-display').innerText;if(!t||t.includes('...'))return;const b=document.getElementById('btn-copy-id'),o=b.innerHTML;if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(()=>{b.innerHTML="✅ Copié !";setTimeout(()=>b.innerHTML=o,2000)})}else{const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();document.execCommand("copy");document.body.removeChild(a);b.innerHTML="✅ Copié !";setTimeout(()=>b.innerHTML=o,2000)}}
-        function shareId(){const t=document.getElementById('my-uid-display').innerText;if(!t||t.includes('...'))return;if(navigator.share){navigator.share({title:'Mon ID Green Codex',text:`Voici mon ID unique pour voir ma collection Green Codex : ${t}`}).catch(console.error)}else{copyToClipboard()}}
-
         function getFlag(c){if(!c)return'🏳️';const m={'france':'🇫🇷','espagne':'🇪🇸','spain':'🇪🇸','usa':'🇺🇸','cali':'🇺🇸','maroc':'🇲🇦','morocco':'🇲🇦','suisse':'🇨🇭','italie':'🇮🇹','canada':'🇨🇦','uk':'🇬🇧','angleterre':'🇬🇧','allemagne':'🇩🇪','thailande':'🇹🇭','pays-bas':'🇳🇱','hollande':'🇳🇱','netherlands':'🇳🇱','belgique':'🇧🇪'};for(let k in m)if(c.toLowerCase().includes(k))return m[k];return'🏳️'}
         function toggleFormFields(c){document.getElementById('hash-fields').classList.toggle('hidden',c!=='hash')}
         const initCharts=()=>{new Chart(document.getElementById('potencyChart'),{type:'bar',data:{labels:['Sativa','Indica','Exotic','Dry Sift','Ice-O-Lator','Rosin','BHO'],datasets:[{label:'% THC',data:[15,20,28,40,65,75,90],backgroundColor:['#10B981','#10B981','#10B981','#D97706','#2563EB','#9333EA','#64748B'],borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:false}}});updateComparator();Plotly.newPlot('globalMatrixPlot',[{x:Object.values(masterData).map(d=>d.matrix.x),y:Object.values(masterData).map(d=>d.matrix.y),text:Object.values(masterData).map(d=>d.name),mode:'markers+text',type:'scatter',textposition:'top center',marker:{size:30,color:Object.values(masterData).map(d=>d.hex)}}],{xaxis:{title:'Pureté',range:[0,100]},yaxis:{title:'Solidité',range:[0,12]},margin:{t:20,l:40},paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)'},{displayModeBar:false})};
