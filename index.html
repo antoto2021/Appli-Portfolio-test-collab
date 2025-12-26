@@ -21,13 +21,24 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // VOS CLÉS FIREBASE SONT ICI
+        const firebaseConfig = {
+          apiKey: "AIzaSyCKuGuHgM3FiuHYdhFunbbqCThQJSBq3tQ",
+          authDomain: "green-codex-app.firebaseapp.com",
+          databaseURL: "https://green-codex-app-default-rtdb.europe-west1.firebasedatabase.app",
+          projectId: "green-codex-app",
+          storageBucket: "green-codex-app.firebasestorage.app",
+          messagingSenderId: "59967188926",
+          appId: "1:59967188926:web:a8211850f8f1aa6248d3ef"
+        };
+
         window.initFirebase = async () => {
-            if (typeof __firebase_config === 'undefined') return null;
             try {
-                const app = initializeApp(JSON.parse(__firebase_config));
+                const app = initializeApp(firebaseConfig);
                 const auth = getAuth(app);
                 const db = getFirestore(app);
-                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default';
+                // Utilisation de l'App ID comme identifiant unique de l'appli (ou 'green_codex_default')
+                const appId = 'green_codex_default'; 
                 
                 window.firebaseFuncs = { doc, setDoc, getDoc, collection, getDocs, deleteDoc };
 
@@ -49,24 +60,46 @@
 
     <style>
         body { font-family: 'Roboto', sans-serif; background-color: #F0FDF4; }
+        
+        /* Utils */
         .chart-container { position: relative; width: 100%; height: 350px; margin: 0 auto; }
         .hidden { display: none !important; }
         .fade-in { animation: fadeIn 0.4s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Interactive Cards */
         .card-interactive { cursor: pointer; transition: all 0.3s ease; }
         .card-interactive:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        
+        /* Inputs */
         .input-field { width: 100%; padding: 12px; border-radius: 0.75rem; border: 1px solid #e2e8f0; background: #fff; outline: none; transition: border-color 0.2s; }
         .input-field:focus { border-color: #10b981; ring: 2px solid #10b981; }
         textarea.input-field { min-height: 120px; resize: vertical; }
-        .editable-highlight { border: 2px dashed #F59E0B; cursor: text; border-radius: 4px; position: relative; background-color: rgba(254, 243, 199, 0.3); }
-        .editable-highlight:hover::after { content: '✎ Modifier'; position: absolute; top: -20px; right: 0; background: #F59E0B; color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; pointer-events: none; z-index: 50; font-weight: bold; }
+
+        /* Edit Mode Styles */
+        .editable-highlight { 
+            border: 2px dashed #F59E0B; cursor: text; border-radius: 4px; position: relative; background-color: rgba(254, 243, 199, 0.3);
+        }
+        .editable-highlight:hover::after { 
+            content: '✎ Modifier'; position: absolute; top: -20px; right: 0; background: #F59E0B; color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; pointer-events: none; z-index: 50; font-weight: bold;
+        }
         .edit-mode-active body { border-top: 4px solid #F59E0B; }
+
+        /* Titles Standardization */
         .section-title { font-size: 1.875rem; line-height: 2.25rem; font-weight: 700; color: #064E3B; margin-bottom: 1rem; }
+        
+        /* Justify Utility */
         .text-justify { text-align: justify; }
-        .collapsible-wrapper { max-height: 0; overflow: hidden; transition: max-height 0.6s ease-in-out, opacity 0.6s ease-in-out; opacity: 0; padding-bottom: 0; }
+
+        /* COLLAPSIBLE SECTIONS STYLES */
+        .collapsible-wrapper {
+            max-height: 0; overflow: hidden; transition: max-height 0.6s ease-in-out, opacity 0.6s ease-in-out; opacity: 0; padding-bottom: 0;
+        }
         .expanded .collapsible-wrapper { max-height: 2000px; opacity: 1; padding-bottom: 20px; }
         .toggle-arrow { transition: transform 0.3s ease; cursor: pointer; }
         .expanded .toggle-arrow { transform: rotate(180deg); }
+
+        /* UPDATE SYSTEM STYLES */
         #updateContainer { position: fixed; bottom: 20px; right: 20px; display: flex; align-items: center; justify-content: flex-end; z-index: 9999; gap: 10px; font-family: Arial, sans-serif; }
         #refreshBtn { background-color: #166534; color: white; border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 35px; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); display: flex; justify-content: center; align-items: center; padding: 0; margin: 0; line-height: 1; transition: background-color 0.3s, transform 0.2s; outline: none; -webkit-tap-highlight-color: transparent; user-select: none; }
         #refreshBtn:active { transform: scale(0.95); background-color: #14532d; }
@@ -78,6 +111,8 @@
         .arrow-pointer { font-size: 24px; color: #166534; margin-right: 5px; }
         .bouncing { animation: bounceLeft 0.5s ease-in-out 4; }
         @keyframes bounceLeft { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-10px); } }
+
+        /* Pop-up What's New */
         #wn-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); z-index: 10000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); opacity: 0; transition: opacity 0.3s ease; }
         #wn-modal { background: white; width: 90%; max-width: 400px; border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; position: relative; transform: translateY(20px); transition: transform 0.3s ease; }
         .wn-header { margin-bottom: 20px; }
@@ -97,10 +132,13 @@
         .show-modal { display: flex !important; opacity: 1 !important; }
         .show-modal #wn-modal { transform: translateY(0) !important; }
         .wn-loader { border: 4px solid #f3f3f3; border-top: 4px solid #166534; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto; }
+
+        /* Friends Bar */
         .friend-avatar { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s; font-size: 18px; user-select: none; }
         .friend-avatar:hover { transform: scale(1.1); }
         .friend-avatar.add-btn { background-color: #f1f5f9; color: #cbd5e1; border: 2px dashed #cbd5e1; }
         .friend-avatar.add-btn:hover { border-color: #10b981; color: #10b981; }
+
     </style>
 </head>
 <body class="text-slate-800 pb-32">
@@ -125,6 +163,8 @@
 
         <!-- ==================== VIEW: HOME ==================== -->
         <div id="view-home" class="fade-in space-y-16">
+            
+            <!-- INTRO -->
             <section id="intro-card" class="bg-white rounded-2xl shadow-md p-8 border-l-8 border-emerald-600 relative group transition-all duration-300">
                 <div class="flex items-center gap-2 mb-2 cursor-pointer" onclick="toggleSection('intro-card')"><h2 class="section-title mb-0" data-editable="intro_title">L'Odyssée de la Plante</h2></div>
                 <div class="text-lg leading-relaxed text-slate-600 text-justify mb-4" data-editable="intro_teaser"><p>L'histoire du <strong>Cannabis Sativa L.</strong> est une épopée botanique et culturelle qui traverse les millénaires. Née dans les steppes d'Asie Centrale, probablement près du plateau tibétain, cette plante a été domestiquée par l'homme il y a plus de 10 000 ans, initialement pour ses fibres robustes et ses graines nutritives.</p></div>
@@ -132,11 +172,16 @@
                 <button onclick="toggleSection('intro-card')" class="absolute bottom-2 left-2 text-emerald-600 p-2 hover:bg-emerald-50 rounded-full transition"><svg class="w-6 h-6 toggle-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
             </section>
 
+            <!-- MY COLLECTION PREVIEW -->
             <section id="my-collection-preview" class="bg-slate-900 rounded-2xl p-8 text-white relative overflow-hidden shadow-xl">
                 <div class="absolute top-0 right-0 w-64 h-64 bg-emerald-500 rounded-full blur-[80px] opacity-20 pointer-events-none"></div>
                 <div class="relative z-10">
                     <div class="flex justify-between items-end mb-6">
-                        <div><h2 class="text-3xl font-bold text-white mb-2" data-editable="col_title">My Collection</h2><p class="text-slate-400" data-editable="col_sub">Votre carnet de dégustation et d'archivage personnel.</p><p class="text-xs text-slate-500 mt-1">Stockage : <span class="font-bold text-emerald-400">IndexedDB (Illimité)</span> <span id="storage-used" class="ml-2 text-slate-400 text-[10px] uppercase font-bold tracking-wider opacity-80">(Calcul...)</span></p></div>
+                        <div>
+                            <h2 class="text-3xl font-bold text-white mb-2" data-editable="col_title">My Collection</h2>
+                            <p class="text-slate-400" data-editable="col_sub">Votre carnet de dégustation et d'archivage personnel.</p>
+                            <p class="text-xs text-slate-500 mt-1">Stockage : <span class="font-bold text-emerald-400">IndexedDB (Illimité)</span> <span id="storage-used" class="ml-2 text-slate-400 text-[10px] uppercase font-bold tracking-wider opacity-80">(Calcul...)</span></p>
+                        </div>
                         <button onclick="showView('collection')" class="bg-emerald-500 hover:bg-emerald-400 text-white px-6 py-3 rounded-xl font-bold transition shadow-lg flex items-center gap-2"><span>📂</span> Ouvrir Portfolio</button>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -148,30 +193,34 @@
                 </div>
             </section>
 
+            <!-- FAMILIES SECTION -->
             <section>
                 <div class="mb-8 border-b border-slate-200 pb-4"><h2 class="section-title" data-editable="fam_title">Les Familles Fondamentales</h2><p class="text-slate-600 max-w-3xl text-justify" data-editable="fam_desc">Le marché moderne se divise en deux grands royaumes : la fleur brute et les extractions. Chacun possède ses méthodes, ses rituels et ses profils aromatiques distincts.</p></div>
                 <h3 class="text-xl font-bold text-slate-700 mb-4 flex items-center" data-editable="fam_sub1">🧪 Concentrés (Hash)</h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
                     <div onclick="showDetail('hash_dry')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-amber-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">🏜️</div> <span class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded h-fit">TRADITION</span> </div><h3 class="text-xl font-bold text-slate-800 group-hover:text-amber-600">Dry Sift</h3><p class="text-sm text-slate-500 text-justify mt-2">Le tamisage à sec traditionnel est une technique artisanale d'extraction de résine. En frottant délicatement les fleurs séchées sur des tamis ultra-fins, on sépare les trichomes de la matière végétale. On obtient ainsi un kief pur et savoureux, apprécié pour sa grande finesse.</p></div>
-                    <div onclick="showDetail('hash_water')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-blue-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">❄️</div> <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded h-fit">PURETÉ</span> </div><h3 class="text-xl font-bold text-slate-800 group-hover:text-blue-600">Ice-O-Lator</h3><p class="text-sm text-slate-500 text-justify mt-2">Extraction à l'eau et glace (Solventless), utilise l'eau glacée pour extraire les trichomes. Le froid rend les glandes de résine cassantes, facilitant leur séparation par agitation. Le mélange est ensuite filtré à travers plusieurs sacs pour obtenir le Bubble Hash.</p></div>
-                    <div onclick="showDetail('hash_rosin')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-purple-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">🔥</div> <span class="text-xs font-bold text-purple-600 bg-purple-50 px-2 py-1 rounded h-fit">MODERNE</span> </div><h3 class="text-xl font-bold text-slate-800 group-hover:text-purple-600">Rosin</h3><p class="text-sm text-slate-500 text-justify mt-2">Une extraction 100 % naturelle obtenue par pression mécanique. En appliquant simultanément de la chaleur et une forte pression sur des fleurs ou du hash, on libère une résine pure, collante et ultra-concentrée, sans solvants chimiques.</p></div>
+                    <div onclick="showDetail('hash_water')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-blue-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">❄️</div> <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded h-fit">PURETÉ</span> </div><h3 class="text-xl font-bold text-slate-800 group-hover:text-blue-600">Ice-O-Lator</h3><p class="text-sm text-slate-500 text-justify mt-2">Extraction à l'eau et glace (Solventless), utilise l'eau glacée pour extraire les trichomes. Le froid rend les glandes de résine cassantes, facilitant leur séparation par agitation. Le mélange est ensuite filtré à travers plusieurs sacs aux mailles de plus en plus serrées pour obtenir de l'Ice-O-Lator ou Bubble Hash.</p></div>
+                    <div onclick="showDetail('hash_rosin')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-purple-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">🔥</div> <span class="text-xs font-bold text-purple-600 bg-purple-50 px-2 py-1 rounded h-fit">MODERNE</span> </div><h3 class="text-xl font-bold text-slate-800 group-hover:text-purple-600">Rosin</h3><p class="text-sm text-slate-500 text-justify mt-2">Une extraction 100 % naturelle obtenue par pression mécanique. En appliquant simultanément de la chaleur et une forte pression sur des fleurs ou du hash, on libère une résine pure, collante et ultra-concentrée, sans jamais utiliser de solvants chimiques.</p></div>
                 </div>
                 <h3 class="text-xl font-bold text-slate-700 mb-4 flex items-center" data-editable="fam_sub2">🌱 Fleur (Weed)</h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div onclick="showDetail('weed_indica')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-indigo-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">🏔️</div> <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded h-fit">RELAX</span> </div><h3 class="text-xl font-bold text-slate-800 group-hover:text-indigo-600">Indica</h3><p class="text-sm text-slate-500 text-justify mt-2">Originaire des montagnes (Kush), petite et trapue. Reconnue pour ses effets relaxants, corporels ("stone"), parfaits pour le sommeil ou la détente.</p></div>
-                    <div onclick="showDetail('weed_sativa')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-yellow-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">☀️</div> <span class="text-xs font-bold text-yellow-600 bg-yellow-50 px-2 py-1 rounded h-fit">ÉNERGIE</span> </div><h3 class="text-xl font-bold text-slate-800 group-hover:text-yellow-600">Sativa</h3><p class="text-sm text-slate-500 text-justify mt-2">Originaire des tropiques, grande et élancée. Appréciée pour ses effets cérébraux, énergisants ("high"), stimulant la créativité.</p></div>
-                    <div onclick="showDetail('weed_exotic')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-pink-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">🧬</div> <span class="text-xs font-bold text-pink-600 bg-pink-50 px-2 py-1 rounded h-fit">HYBRIDE</span> </div><h3 class="text-xl font-bold text-slate-800 group-hover:text-pink-600">Exotics</h3><p class="text-sm text-slate-500 text-justify mt-2">Le haut de gamme moderne (souvent US/Cali). Croisements complexes privilégiant des arômes intenses (terpènes) et une esthétique visuelle (couleurs, trichomes).</p></div>
+                    <div onclick="showDetail('weed_indica')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-indigo-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">🏔️</div> <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded h-fit">RELAX</span> </div><h3 class="text-xl font-bold text-slate-800 group-hover:text-indigo-600">Indica</h3><p class="text-sm text-slate-500 text-justify mt-2">C'est une variété de cannabis originaire des régions montagneuses comme l'Hindou Kouch. Petite et trapue, elle se reconnaît à ses feuilles larges et sombres. Elle est réputée pour ses effets relaxants et corporels ("stone"), idéaux pour apaiser le stress ou favoriser le sommeil.</p></div>
+                    <div onclick="showDetail('weed_sativa')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-yellow-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">☀️</div> <span class="text-xs font-bold text-yellow-600 bg-yellow-50 px-2 py-1 rounded h-fit">ÉNERGIE</span> </div><h3 class="text-xl font-bold text-slate-800 group-hover:text-yellow-600">Sativa</h3><p class="text-sm text-slate-500 text-justify mt-2">C'est une variété originaire des régions tropicales. Grande et élancée, elle possède des feuilles fines et des cycles de floraison longs. Elle est recherchée pour ses effets stimulants et cérébraux ("high"), favorisant la créativité, l'énergie et la concentration.</p></div>
+                    <div onclick="showDetail('weed_exotic')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-pink-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">🧬</div> <span class="text-xs font-bold text-pink-600 bg-pink-50 px-2 py-1 rounded h-fit">HYBRIDE</span> </div><h3 class="text-xl font-bold text-slate-800 group-hover:text-pink-600">Exotics</h3><p class="text-sm text-slate-500 text-justify mt-2">Elle désigne des variétés de cannabis haut de gamme, souvent issues de croisements complexes aux États-Unis. Elles se distinguent par des couleurs vibrantes, des arômes intenses et uniques, ainsi qu'une puissance élevée. C'est le segment « luxe » du marché, privilégiant la qualité visuelle et gustative.</p></div>
                 </div>
             </section>
 
+            <!-- POTENCY -->
             <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg"><h2 class="section-title" data-editable="potency_title">Échelle de Puissance</h2><p class="text-slate-600 mb-4 text-sm text-justify" data-editable="potency_desc">Comparatif des taux moyens de THC observés en laboratoire.</p><div class="chart-container"><canvas id="potencyChart"></canvas></div></div>
-                <div class="lg:col-span-1 bg-emerald-50 border-l-4 border-emerald-500 p-6 rounded-r-xl"><h4 class="font-bold text-emerald-900 text-lg mb-2" data-editable="didyouknow_title">Le Mythe du THC</h4><p class="text-sm text-emerald-800 leading-relaxed text-justify" data-editable="didyouknow_text">Attention : un taux de THC élevé (80%+) ne garantit pas une expérience "meilleure". C'est l'<strong>Effet d'Entourage</strong> qui compte : la synergie complexe entre les cannabinoïdes et les terpènes.</p><p class="text-sm text-emerald-800 leading-relaxed text-justify mt-4" data-editable="didyouknow_text">Par exemple, le <strong>Myrcène</strong> (dominant dans la OG Kush ou un Hash Afghan) ancre la relaxation physique, tandis que le <strong>Limonène</strong> (typique de la Super Lemon Haze) booste l'énergie et l'humeur.</p></div>
+                <div class="lg:col-span-1 bg-emerald-50 border-l-4 border-emerald-500 p-6 rounded-r-xl"><h4 class="font-bold text-emerald-900 text-lg mb-2" data-editable="didyouknow_title">Le Mythe du THC</h4><p class="text-sm text-emerald-800 leading-relaxed text-justify" data-editable="didyouknow_text">Attention : un taux de THC élevé (80%+) ne garantit pas une expérience "meilleure". C'est l'<strong>Effet d'Entourage</strong> qui compte : la synergie complexe entre les cannabinoïdes et les terpènes.</p><p class="text-sm text-emerald-800 leading-relaxed text-justify mt-4" data-editable="didyouknow_text">Par exemple, le <strong>Myrcène</strong> (dominant dans la OG Kush ou un Hash Afghan) ancre la relaxation physique, tandis que le <strong>Limonène</strong> (typique de la Super Lemon Haze) booste l'énergie et l'humeur. Le <strong>Caryophyllène</strong> (Girl Scout Cookies) apporte, lui, un apaisement anti-stress. Cette synergie crée une expérience bien plus riche et nuancée que la puissance brute isolée.</p></div>
             </section>
 
+            <!-- COMPARATOR & MATRIX -->
             <section class="bg-white p-8 rounded-2xl shadow-xl border border-slate-100"><h2 class="section-title" data-editable="comp_title">Comparateur Interactif</h2><div class="grid grid-cols-1 md:grid-cols-3 gap-8"><div class="space-y-6 flex flex-col justify-center bg-slate-50 p-6 rounded-xl"><div><label class="block text-sm font-bold text-slate-700 mb-2">Produit A</label><select id="selectA" class="w-full p-3 rounded border border-slate-300 bg-white outline-none" onchange="updateComparator()"></select></div><div><label class="block text-sm font-bold text-slate-700 mb-2">Produit B</label><select id="selectB" class="w-full p-3 rounded border border-slate-300 bg-white outline-none" onchange="updateComparator()"></select></div></div><div class="md:col-span-2"><div class="chart-container"><canvas id="comparatorRadar"></canvas></div></div></div></section>
             <section class="bg-white p-6 rounded-xl shadow-md"><h2 class="section-title" data-editable="matrix_title">Texture vs Pureté</h2><div id="globalMatrixPlot" class="w-full h-[500px]"></div></section>
 
+            <!-- LEXICON -->
             <section class="bg-slate-900 text-slate-300 p-8 rounded-xl">
                 <h2 class="section-title !text-white" data-editable="lex_title">Lexique du Connaisseur</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-sm text-justify">
@@ -180,13 +229,14 @@
                     <div><strong class="block text-emerald-400 mb-1">Full Melt</strong><span data-editable="lex_3">Un gage de pureté extrême pour un hash (souvent Water Hash) qui fond totalement à la chaleur sans laisser aucun résidu (6 étoiles).</span></div>
                     <div><strong class="block text-emerald-400 mb-1">Solventless</strong><span data-editable="lex_4">Méthodes d'extraction mécaniques utilisant uniquement l'eau, la glace, la chaleur et la pression. Aucune chimie.</span></div>
                     <div><strong class="block text-emerald-400 mb-1">Fresh Frozen</strong><span data-editable="lex_5">Plante congelée immédiatement après récolte (sans séchage) pour préserver les terpènes volatils "vivants" (Live Resin/Rosin).</span></div>
-                    <div><strong class="block text-emerald-400 mb-1">WPFF (Whole Plant)</strong><span data-editable="lex_6">Acronyme de "Whole Plant Fresh Frozen". Désigne le summum de la qualité : contrairement au Fresh Frozen standard, on congèle ici la plante entière.</span></div>
+                    <div><strong class="block text-emerald-400 mb-1">WPFF (Whole Plant)</strong><span data-editable="lex_6">Acronyme de "Whole Plant Fresh Frozen". Désigne le summum de la qualité : contrairement au Fresh Frozen standard, on congèle ici la plante entière (avec ses meilleures fleurs) et non juste les restes de taille.</span></div>
                     <div><strong class="block text-emerald-400 mb-1">Curing</strong><span data-editable="lex_7">Processus d'affinage lent en bocal hermétique. Crucial pour stabiliser l'humidité et développer la complexité aromatique.</span></div>
                     <div><strong class="block text-emerald-400 mb-1">Pheno Hunting</strong><span data-editable="lex_8">L'art de sélectionner la meilleure plante (le meilleur phénotype) parmi des centaines de graines d'une même variété.</span></div>
                     <div><strong class="block text-emerald-400 mb-1">Wash</strong><span data-editable="lex_9">Action de laver la matière végétale dans de l'eau glacée pour en détacher les trichomes (pour faire du Bubble Hash).</span></div>
                 </div>
             </section>
 
+            <!-- DYNAMIC SECTIONS -->
             <div id="custom-sections-container" class="space-y-16"></div>
             <div id="add-section-area" class="hidden text-center py-10 border-t-2 border-dashed border-slate-300 mt-12"><button onclick="openSectionModal()" class="bg-amber-500 hover:bg-amber-600 text-white px-8 py-4 rounded-full font-bold shadow-lg transition transform hover:scale-105 mx-auto">+ Ajouter une Section</button></div>
         </div>
@@ -200,7 +250,7 @@
             <section class="grid grid-cols-1 lg:grid-cols-2 gap-8"><div class="bg-white p-6 rounded-xl shadow-md"><div class="chart-container"><canvas id="detailRadarChart"></canvas></div></div><div class="bg-white p-6 rounded-xl shadow-md"><div class="chart-container"><canvas id="detailBarChart"></canvas></div></div></section>
         </div>
 
-        <!-- ==================== VIEW: COLLECTION ==================== -->
+        <!-- ==================== VIEW: COLLECTION (MODIFIÉ: BARRE AMIS AJOUTÉE ICI) ==================== -->
         <div id="view-collection" class="hidden fade-in pb-20">
             <!-- BARRE AMIS -->
             <div class="mb-6 flex items-center justify-between border-b border-slate-200 pb-4 bg-white p-4 rounded-xl shadow-sm">
@@ -219,14 +269,14 @@
             <div id="empty-state" class="hidden text-center py-20 text-slate-400"><div class="text-6xl mb-4">📭</div><p>Votre collection est vide.</p></div>
         </div>
 
-        <!-- ==================== VIEW: FRIEND PORTFOLIO ==================== -->
+        <!-- ==================== VIEW: FRIEND PORTFOLIO (NEW) ==================== -->
         <div id="view-friend" class="hidden fade-in pb-20">
             <div class="bg-blue-600 text-white p-6 rounded-2xl shadow-lg mb-6">
                 <h2 class="text-3xl font-bold mb-2">Portfolio de <span id="friend-view-name">Ami</span></h2>
                 <p class="text-blue-200 text-sm">Mode lecture seule.</p>
             </div>
             <div id="friend-collection-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-            <div id="friend-empty-state" class="hidden text-center py-20 text-slate-400"><div class="text-6xl mb-4">🔒</div><p>Aucune entrée visible.</p></div>
+            <div id="friend-empty-state" class="hidden text-center py-20 text-slate-400"><div class="text-6xl mb-4">🔒</div><p>Aucune entrée visible ou portefeuille privé.</p></div>
         </div>
 
         <!-- ==================== VIEW: INFO (MODIFIÉ: STOCKAGE + ID) ==================== -->
@@ -249,13 +299,13 @@
 
                     <div class="grid grid-cols-2 gap-4 border-t border-emerald-200 pt-4">
                         <div class="border-r border-emerald-200 pr-2">
-                            <h3 class="text-[10px] font-bold text-emerald-700 uppercase tracking-widest mb-1">Installée</h3>
+                            <h3 class="text-[10px] font-bold text-emerald-700 uppercase tracking-widest mb-1">Installée (Local)</h3>
                             <div class="font-mono text-xs font-bold text-slate-700 break-all" id="info-local-hash">-</div>
                             <p class="text-[10px] text-emerald-500 mt-1" id="info-local-date">Date inconnue</p>
                         </div>
                         <div class="pl-2 text-right">
                              <div class="flex items-center justify-end gap-2 mb-1">
-                                <span class="text-[10px] font-bold text-emerald-700 uppercase">GitHub</span>
+                                <span class="text-[10px] font-bold text-emerald-700 uppercase">Disponible (GitHub)</span>
                                 <div id="connection-status" class="w-2 h-2 rounded-full bg-gray-400"></div>
                             </div>
                             <div class="font-mono text-xs font-bold text-emerald-600 break-all" id="info-remote-hash">...</div>
@@ -302,7 +352,7 @@
         <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
             <h3 id="modal-title" class="text-2xl font-bold text-slate-800 mb-6">Ajouter à la collection</h3>
             <form id="collection-form" onsubmit="handleCollectionSubmit(event)" class="space-y-4">
-                <input type="hidden" name="editId" id="editId" value="">
+                <input type="hidden" name="editIndex" id="editIndex" value="-1">
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-1"><label class="text-xs font-bold text-slate-500 uppercase">Catégorie</label><select name="category" id="inp-category" class="input-field" onchange="toggleFormFields(this.value)"><option value="weed">🥦 Weed</option><option value="hash">🍫 Hash</option></select></div>
                     <div class="space-y-1"><label class="text-xs font-bold text-slate-500 uppercase">Quantité (g)</label><input type="number" step="0.1" name="quantity" id="inp-quantity" class="input-field" placeholder="ex: 3.5"></div>
@@ -433,6 +483,12 @@
                     if (firebaseInstance) {
                         myUid = firebaseInstance.user.uid;
                         console.log("Firebase Connected. UID:", myUid);
+                        // Save UID locally for persistence
+                        await db.save('config', { key: 'user_uid', value: myUid });
+                    } else {
+                        // Try to recover UID from local DB if offline
+                        const savedUid = (await db.getAll('config')).find(c => c.key === 'user_uid');
+                        if(savedUid) myUid = savedUid.value;
                     }
                 }
 
@@ -455,7 +511,8 @@
                 try {
                     const { setDoc, doc } = window.firebaseFuncs;
                     const { db: firestore, appId } = firebaseInstance;
-                    const cleanItem = { ...item, photos: [] }; // Strip photos
+                    const cleanItem = { ...item, photos: [] }; // Strip photos for sync
+                    // NOTE: We do NOT sync the friends list. It remains local.
                     await setDoc(doc(firestore, 'artifacts', appId, 'users', myUid, 'portfolio', id.toString()), cleanItem);
                 } catch(e) { console.error("Sync Error", e); }
             }
@@ -525,6 +582,8 @@
                 const { getDocs, collection: fsCol } = window.firebaseFuncs;
                 const { db: firestore, appId } = firebaseInstance;
                 
+                // We only fetch the 'portfolio' collection of the friend ID.
+                // We DO NOT fetch their 'friends' list or other private data.
                 const snapshot = await getDocs(fsCol(firestore, 'artifacts', appId, 'users', friend.id, 'portfolio'));
                 const friendItems = [];
                 snapshot.forEach(doc => friendItems.push(doc.data()));
