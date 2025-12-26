@@ -21,7 +21,7 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // VOS CLÉS FIREBASE SONT ICI
+        // VOS CLÉS FIREBASE
         const firebaseConfig = {
           apiKey: "AIzaSyCKuGuHgM3FiuHYdhFunbbqCThQJSBq3tQ",
           authDomain: "green-codex-app.firebaseapp.com",
@@ -37,9 +37,9 @@
                 const app = initializeApp(firebaseConfig);
                 const auth = getAuth(app);
                 const db = getFirestore(app);
-                // Utilisation de l'App ID comme identifiant unique de l'appli (ou 'green_codex_default')
-                const appId = 'green_codex_default'; 
+                const appId = 'green_codex_default'; // ID unique pour l'appli partagée
                 
+                // Expose functions globally for the main script
                 window.firebaseFuncs = { doc, setDoc, getDoc, collection, getDocs, deleteDoc };
 
                 return new Promise((resolve) => {
@@ -229,7 +229,7 @@
                     <div><strong class="block text-emerald-400 mb-1">Full Melt</strong><span data-editable="lex_3">Un gage de pureté extrême pour un hash (souvent Water Hash) qui fond totalement à la chaleur sans laisser aucun résidu (6 étoiles).</span></div>
                     <div><strong class="block text-emerald-400 mb-1">Solventless</strong><span data-editable="lex_4">Méthodes d'extraction mécaniques utilisant uniquement l'eau, la glace, la chaleur et la pression. Aucune chimie.</span></div>
                     <div><strong class="block text-emerald-400 mb-1">Fresh Frozen</strong><span data-editable="lex_5">Plante congelée immédiatement après récolte (sans séchage) pour préserver les terpènes volatils "vivants" (Live Resin/Rosin).</span></div>
-                    <div><strong class="block text-emerald-400 mb-1">WPFF (Whole Plant)</strong><span data-editable="lex_6">Acronyme de "Whole Plant Fresh Frozen". Désigne le summum de la qualité : contrairement au Fresh Frozen standard, on congèle ici la plante entière (avec ses meilleures fleurs) et non juste les restes de taille.</span></div>
+                    <div><strong class="block text-emerald-400 mb-1">WPFF (Whole Plant)</strong><span data-editable="lex_6">Acronyme de "Whole Plant Fresh Frozen". Désigne le summum de la qualité : contrairement au Fresh Frozen standard, on congèle ici la plante entière.</span></div>
                     <div><strong class="block text-emerald-400 mb-1">Curing</strong><span data-editable="lex_7">Processus d'affinage lent en bocal hermétique. Crucial pour stabiliser l'humidité et développer la complexité aromatique.</span></div>
                     <div><strong class="block text-emerald-400 mb-1">Pheno Hunting</strong><span data-editable="lex_8">L'art de sélectionner la meilleure plante (le meilleur phénotype) parmi des centaines de graines d'une même variété.</span></div>
                     <div><strong class="block text-emerald-400 mb-1">Wash</strong><span data-editable="lex_9">Action de laver la matière végétale dans de l'eau glacée pour en détacher les trichomes (pour faire du Bubble Hash).</span></div>
@@ -250,7 +250,7 @@
             <section class="grid grid-cols-1 lg:grid-cols-2 gap-8"><div class="bg-white p-6 rounded-xl shadow-md"><div class="chart-container"><canvas id="detailRadarChart"></canvas></div></div><div class="bg-white p-6 rounded-xl shadow-md"><div class="chart-container"><canvas id="detailBarChart"></canvas></div></div></section>
         </div>
 
-        <!-- ==================== VIEW: COLLECTION (MODIFIÉ: BARRE AMIS AJOUTÉE ICI) ==================== -->
+        <!-- ==================== VIEW: COLLECTION ==================== -->
         <div id="view-collection" class="hidden fade-in pb-20">
             <!-- BARRE AMIS -->
             <div class="mb-6 flex items-center justify-between border-b border-slate-200 pb-4 bg-white p-4 rounded-xl shadow-sm">
@@ -269,7 +269,7 @@
             <div id="empty-state" class="hidden text-center py-20 text-slate-400"><div class="text-6xl mb-4">📭</div><p>Votre collection est vide.</p></div>
         </div>
 
-        <!-- ==================== VIEW: FRIEND PORTFOLIO (NEW) ==================== -->
+        <!-- ==================== VIEW: FRIEND PORTFOLIO ==================== -->
         <div id="view-friend" class="hidden fade-in pb-20">
             <div class="bg-blue-600 text-white p-6 rounded-2xl shadow-lg mb-6">
                 <h2 class="text-3xl font-bold mb-2">Portfolio de <span id="friend-view-name">Ami</span></h2>
@@ -279,7 +279,7 @@
             <div id="friend-empty-state" class="hidden text-center py-20 text-slate-400"><div class="text-6xl mb-4">🔒</div><p>Aucune entrée visible ou portefeuille privé.</p></div>
         </div>
 
-        <!-- ==================== VIEW: INFO (MODIFIÉ: STOCKAGE + ID) ==================== -->
+        <!-- ==================== VIEW: INFO ==================== -->
         <div id="view-info" class="hidden fade-in space-y-8">
             <div class="bg-white p-6 rounded-2xl shadow-lg border-l-8 border-emerald-600">
                 <h2 class="text-2xl font-black text-slate-800 mb-6 flex items-center gap-3">ℹ️ Informations & Aide</h2>
@@ -314,7 +314,7 @@
                     <button onclick="forceUpdate()" class="mt-4 w-full bg-emerald-600 text-white font-bold py-2 rounded-lg hover:bg-emerald-500 transition text-sm flex justify-center items-center gap-2"><span>🔄</span> Vérifier maintenant</button>
                 </div>
 
-                <!-- STOCKAGE (NOUVEAU) -->
+                <!-- STOCKAGE -->
                 <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl relative shadow-sm mb-4">
                     <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2 mb-2">💾 État du Stockage Local</h3>
                     <div class="flex justify-between items-end">
@@ -352,7 +352,7 @@
         <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
             <h3 id="modal-title" class="text-2xl font-bold text-slate-800 mb-6">Ajouter à la collection</h3>
             <form id="collection-form" onsubmit="handleCollectionSubmit(event)" class="space-y-4">
-                <input type="hidden" name="editIndex" id="editIndex" value="-1">
+                <input type="hidden" name="editId" id="editId" value="">
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-1"><label class="text-xs font-bold text-slate-500 uppercase">Catégorie</label><select name="category" id="inp-category" class="input-field" onchange="toggleFormFields(this.value)"><option value="weed">🥦 Weed</option><option value="hash">🍫 Hash</option></select></div>
                     <div class="space-y-1"><label class="text-xs font-bold text-slate-500 uppercase">Quantité (g)</label><input type="number" step="0.1" name="quantity" id="inp-quantity" class="input-field" placeholder="ex: 3.5"></div>
@@ -500,21 +500,29 @@
 
         // --- COLLECTION LOGIC ---
         async function saveCollectionItem(item) {
-            const id = await db.save('collection', item);
-            item.id = id; 
-            collection = await db.getAll('collection');
-            updateDashboardStats();
-            renderCollectionList();
-            
-            // Sync to Cloud (Sans photos)
-            if(window.firebaseFuncs && firebaseInstance) {
-                try {
-                    const { setDoc, doc } = window.firebaseFuncs;
-                    const { db: firestore, appId } = firebaseInstance;
-                    const cleanItem = { ...item, photos: [] }; // Strip photos for sync
-                    // NOTE: We do NOT sync the friends list. It remains local.
-                    await setDoc(doc(firestore, 'artifacts', appId, 'users', myUid, 'portfolio', id.toString()), cleanItem);
-                } catch(e) { console.error("Sync Error", e); }
+            try {
+                // Save locally first
+                const id = await db.save('collection', item);
+                item.id = id; 
+                
+                // Refresh local view
+                collection = await db.getAll('collection');
+                updateDashboardStats();
+                renderCollectionList();
+                
+                // Sync to Cloud (Sans photos et sans liste d'amis)
+                if(window.firebaseFuncs && firebaseInstance) {
+                    try {
+                        const { setDoc, doc } = window.firebaseFuncs;
+                        const { db: firestore, appId } = firebaseInstance;
+                        const cleanItem = { ...item, photos: [] }; // Strip photos for sync
+                        // On n'envoie JAMAIS la liste d'amis
+                        await setDoc(doc(firestore, 'artifacts', appId, 'users', myUid, 'portfolio', id.toString()), cleanItem);
+                    } catch(e) { console.error("Sync Error", e); }
+                }
+            } catch (e) {
+                console.error("Save Error:", e);
+                alert("Erreur lors de la sauvegarde locale.");
             }
         }
 
@@ -537,7 +545,7 @@
             }
         }
 
-        // --- FRIENDS LOGIC (LOCAL ONLY) ---
+        // --- FRIENDS LOGIC (LOCAL ONLY - NO SYNC) ---
         async function promptAddFriend() {
             const friendId = prompt("Entrez l'ID Unique de votre ami (disponible dans l'onglet Info de son appli) :");
             if (friendId && friendId.length > 5) {
@@ -553,7 +561,6 @@
 
         function renderFriendsList() {
             const container = document.getElementById('friends-list');
-            const addBtn = container.querySelector('.add-btn');
             container.innerHTML = '';
             
             friends.forEach(f => {
@@ -564,6 +571,12 @@
                 el.onclick = () => viewFriendPortfolio(f);
                 container.appendChild(el);
             });
+            // Add Button always at the end
+            const addBtn = document.createElement('div');
+            addBtn.className = 'friend-avatar add-btn';
+            addBtn.innerText = '+';
+            addBtn.title = 'Ajouter un ami';
+            addBtn.onclick = () => promptAddFriend();
             container.appendChild(addBtn);
         }
 
@@ -582,8 +595,6 @@
                 const { getDocs, collection: fsCol } = window.firebaseFuncs;
                 const { db: firestore, appId } = firebaseInstance;
                 
-                // We only fetch the 'portfolio' collection of the friend ID.
-                // We DO NOT fetch their 'friends' list or other private data.
                 const snapshot = await getDocs(fsCol(firestore, 'artifacts', appId, 'users', friend.id, 'portfolio'));
                 const friendItems = [];
                 snapshot.forEach(doc => friendItems.push(doc.data()));
