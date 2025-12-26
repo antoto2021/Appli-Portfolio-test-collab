@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-title" content="Green Codex">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="logo appli.png">
+    <link rel="icon" type="image/png" href="logo appli.png">
+    <title>Green Codex</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Firebase Module Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        window.initFirebase = async () => {
+            if (typeof __firebase_config === 'undefined') return null;
+            try {
+                const app = initializeApp(JSON.parse(__firebase_config));
+                const auth = getAuth(app);
+                const db = getFirestore(app);
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default';
+                
+                window.firebaseFuncs = { doc, setDoc, getDoc, collection, getDocs, deleteDoc };
+
+                return new Promise((resolve) => {
+                    onAuthStateChanged(auth, (user) => {
+                        if (user) {
+                            resolve({ db, user, appId });
+                        } else {
+                            signInAnonymously(auth).then((cred) => resolve({ db, user: cred.user, appId })).catch(e => resolve(null));
+                        }
+                    });
+                });
+            } catch (e) {
+                console.error("Firebase Init Error", e);
+                return null;
+            }
+        };
+    </script>
+
+    <style>
+        body { font-family: 'Roboto', sans-serif; background-color: #F0FDF4; }
+        .chart-container { position: relative; width: 100%; height: 350px; margin: 0 auto; }
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .card-interactive { cursor: pointer; transition: all 0.3s ease; }
+        .card-interactive:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .input-field { width: 100%; padding: 12px; border-radius: 0.75rem; border: 1px solid #e2e8f0; background: #fff; outline: none; transition: border-color 0.2s; }
+        .input-field:focus { border-color: #10b981; ring: 2px solid #10b981; }
+        textarea.input-field { min-height: 120px; resize: vertical; }
+        .editable-highlight { border: 2px dashed #F59E0B; cursor: text; border-radius: 4px; position: relative; background-color: rgba(254, 243, 199, 0.3); }
+        .editable-highlight:hover::after { content: '✎ Modifier'; position: absolute; top: -20px; right: 0; background: #F59E0B; color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; pointer-events: none; z-index: 50; font-weight: bold; }
+        .edit-mode-active body { border-top: 4px solid #F59E0B; }
+        .section-title { font-size: 1.875rem; line-height: 2.25rem; font-weight: 700; color: #064E3B; margin-bottom: 1rem; }
+        .text-justify { text-align: justify; }
+        .collapsible-wrapper { max-height: 0; overflow: hidden; transition: max-height 0.6s ease-in-out, opacity 0.6s ease-in-out; opacity: 0; padding-bottom: 0; }
+        .expanded .collapsible-wrapper { max-height: 2000px; opacity: 1; padding-bottom: 20px; }
+        .toggle-arrow { transition: transform 0.3s ease; cursor: pointer; }
+        .expanded .toggle-arrow { transform: rotate(180deg); }
+        #updateContainer { position: fixed; bottom: 20px; right: 20px; display: flex; align-items: center; justify-content: flex-end; z-index: 9999; gap: 10px; font-family: Arial, sans-serif; }
+        #refreshBtn { background-color: #166534; color: white; border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 35px; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3); display: flex; justify-content: center; align-items: center; padding: 0; margin: 0; line-height: 1; transition: background-color 0.3s, transform 0.2s; outline: none; -webkit-tap-highlight-color: transparent; user-select: none; }
+        #refreshBtn:active { transform: scale(0.95); background-color: #14532d; }
+        .update-dot { position: absolute; top: 0; right: 0; width: 15px; height: 15px; background-color: #ef4444; border-radius: 50%; border: 2px solid white; display: none; }
+        .rotating { animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #updateAlert { display: none; flex-direction: row; align-items: center; }
+        .update-text { color: #166534; font-weight: bold; font-size: 14px; margin-right: 5px; background: rgba(255,255,255,0.95); padding: 6px 10px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .arrow-pointer { font-size: 24px; color: #166534; margin-right: 5px; }
+        .bouncing { animation: bounceLeft 0.5s ease-in-out 4; }
+        @keyframes bounceLeft { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-10px); } }
+        #wn-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); z-index: 10000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); opacity: 0; transition: opacity 0.3s ease; }
+        #wn-modal { background: white; width: 90%; max-width: 400px; border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; position: relative; transform: translateY(20px); transition: transform 0.3s ease; }
+        .wn-header { margin-bottom: 20px; }
+        .wn-badge { background-color: #dcfce7; color: #166534; font-size: 10px; text-transform: uppercase; font-weight: bold; padding: 4px 8px; border-radius: 12px; display: inline-block; margin-bottom: 10px; }
+        .wn-title { font-size: 22px; font-weight: 900; color: #1f2937; margin: 0; }
+        .wn-slides-container { height: 200px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+        .wn-slide { display: none; width: 100%; animation: slideIn 0.4s ease forwards; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+        .wn-icon { font-size: 50px; margin-bottom: 15px; display: block; }
+        .wn-slide-title { font-size: 18px; font-weight: bold; color: #166534; margin-bottom: 10px; display: block; }
+        .wn-desc { font-size: 14px; color: #6b7280; line-height: 1.5; }
+        .wn-dots { display: flex; justify-content: center; gap: 8px; margin: 20px 0; }
+        .wn-dot { width: 8px; height: 8px; background-color: #e5e7eb; border-radius: 50%; transition: background-color 0.3s; }
+        .wn-dot.active { background-color: #166534; width: 20px; border-radius: 4px; }
+        #wn-btn { background-color: #166534; color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        #wn-btn:hover { background-color: #14532d; }
+        .show-modal { display: flex !important; opacity: 1 !important; }
+        .show-modal #wn-modal { transform: translateY(0) !important; }
+        .wn-loader { border: 4px solid #f3f3f3; border-top: 4px solid #166534; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto; }
+        .friend-avatar { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s; font-size: 18px; user-select: none; }
+        .friend-avatar:hover { transform: scale(1.1); }
+        .friend-avatar.add-btn { background-color: #f1f5f9; color: #cbd5e1; border: 2px dashed #cbd5e1; }
+        .friend-avatar.add-btn:hover { border-color: #10b981; color: #10b981; }
+    </style>
+</head>
+<body class="text-slate-800 pb-32">
+
+    <!-- HEADER -->
+    <header class="bg-gradient-to-r from-emerald-900 to-emerald-700 text-white p-6 shadow-lg sticky top-0 z-50 transition-colors" id="main-header">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div onclick="showView('home')" class="cursor-pointer">
+                <h1 class="text-2xl md:text-3xl font-black tracking-tight" data-editable="app_title">GREEN <span class="text-emerald-300">CODEX</span></h1>
+                <p class="text-xs md:text-sm text-emerald-200" data-editable="app_subtitle">Encyclopédie Cannabique & Collection Personnel</p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="showView('info')" class="bg-white/10 hover:bg-white/20 text-white w-10 h-10 rounded-lg text-lg font-bold transition flex items-center justify-center border border-white/20">ℹ️</button>
+                <button onclick="toggleEditMode()" id="editModeBtn" class="bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2 border border-white/20"><span>✏️</span> <span class="hidden md:inline">Mode Édition</span></button>
+                <button id="navBackBtn" onclick="showView('home')" class="hidden bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg text-sm font-bold transition backdrop-blur-sm">← Retour</button>
+            </div>
+        </div>
+        <div id="edit-banner" class="hidden w-full bg-amber-500 text-white text-center text-xs font-bold py-1 mt-2 rounded shadow-inner">MODE ÉDITION ACTIF - Cliquez sur n'importe quel texte pour le modifier.</div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-4 md:p-8 space-y-16">
+
+        <!-- ==================== VIEW: HOME ==================== -->
+        <div id="view-home" class="fade-in space-y-16">
+            <section id="intro-card" class="bg-white rounded-2xl shadow-md p-8 border-l-8 border-emerald-600 relative group transition-all duration-300">
+                <div class="flex items-center gap-2 mb-2 cursor-pointer" onclick="toggleSection('intro-card')"><h2 class="section-title mb-0" data-editable="intro_title">L'Odyssée de la Plante</h2></div>
+                <div class="text-lg leading-relaxed text-slate-600 text-justify mb-4" data-editable="intro_teaser"><p>L'histoire du <strong>Cannabis Sativa L.</strong> est une épopée botanique et culturelle qui traverse les millénaires. Née dans les steppes d'Asie Centrale, probablement près du plateau tibétain, cette plante a été domestiquée par l'homme il y a plus de 10 000 ans, initialement pour ses fibres robustes et ses graines nutritives.</p></div>
+                <div class="collapsible-wrapper"><div class="text-lg leading-relaxed text-slate-600 space-y-4 text-justify" data-editable="intro_text"><p>Au fil des siècles, la plante a voyagé le long des routes de la soie, s'adaptant à divers climats pour donner naissance à deux grandes lignées : les variétés tropicales, élancées et énergisantes (Sativa), et les variétés de montagne, trapues et résineuses (Indica). Cette diversité génétique est aujourd'hui la base de milliers d'hybrides modernes.</p><p>Historiquement, deux grandes traditions de consommation s'opposent et se complètent. D'un côté, la culture de la <strong>Fleur (Weed)</strong>, séchée avec soin pour préserver ses arômes délicats. De l'autre, l'art ancestral du <strong>Hashish</strong>, perfectionné au Moyen-Orient et en Asie (Maroc, Afghanistan, Népal), qui consiste à séparer mécaniquement les trichomes pour obtenir un concentré pur, stable et puissant.</p><p>Aujourd'hui, nous vivons une véritable renaissance cannabique. La science moderne nous permet enfin de décrypter l'interaction subtile entre les cannabinoïdes (THC, CBD...) et les terpènes (les molécules aromatiques). Cette application, le Green Codex, est conçue pour vous guider dans cette nouvelle ère, vous aidant à comprendre, archiver et apprécier la complexité de chaque produit.</p></div></div>
+                <button onclick="toggleSection('intro-card')" class="absolute bottom-2 left-2 text-emerald-600 p-2 hover:bg-emerald-50 rounded-full transition"><svg class="w-6 h-6 toggle-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+            </section>
+
+            <section id="my-collection-preview" class="bg-slate-900 rounded-2xl p-8 text-white relative overflow-hidden shadow-xl">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-emerald-500 rounded-full blur-[80px] opacity-20 pointer-events-none"></div>
+                <div class="relative z-10">
+                    <div class="flex justify-between items-end mb-6">
+                        <div><h2 class="text-3xl font-bold text-white mb-2" data-editable="col_title">My Collection</h2><p class="text-slate-400" data-editable="col_sub">Votre carnet de dégustation et d'archivage personnel.</p><p class="text-xs text-slate-500 mt-1">Stockage : <span class="font-bold text-emerald-400">IndexedDB (Illimité)</span> <span id="storage-used" class="ml-2 text-slate-400 text-[10px] uppercase font-bold tracking-wider opacity-80">(Calcul...)</span></p></div>
+                        <button onclick="showView('collection')" class="bg-emerald-500 hover:bg-emerald-400 text-white px-6 py-3 rounded-xl font-bold transition shadow-lg flex items-center gap-2"><span>📂</span> Ouvrir Portfolio</button>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700"><span class="text-slate-400 text-xs uppercase font-bold">Total Entrées</span><div class="text-3xl font-black text-white" id="stats-total">0</div></div>
+                        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700"><span class="text-slate-400 text-xs uppercase font-bold">Weeds 🥦</span><div class="text-3xl font-black text-emerald-400" id="stats-weed">0</div></div>
+                        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700"><span class="text-slate-400 text-xs uppercase font-bold">Hashs 🍫</span><div class="text-3xl font-black text-amber-500" id="stats-hash">0</div></div>
+                        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700"><span class="text-slate-400 text-xs uppercase font-bold">Masse Totale</span><div class="text-3xl font-black text-purple-400" id="stats-mass">0g</div></div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <div class="mb-8 border-b border-slate-200 pb-4"><h2 class="section-title" data-editable="fam_title">Les Familles Fondamentales</h2><p class="text-slate-600 max-w-3xl text-justify" data-editable="fam_desc">Le marché moderne se divise en deux grands royaumes : la fleur brute et les extractions. Chacun possède ses méthodes, ses rituels et ses profils aromatiques distincts.</p></div>
+                <h3 class="text-xl font-bold text-slate-700 mb-4 flex items-center" data-editable="fam_sub1">🧪 Concentrés (Hash)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                    <div onclick="showDetail('hash_dry')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-amber-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">🏜️</div> <span class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded h-fit">TRADITION</span> </div><h3 class="text-xl font-bold text-slate-800 group-hover:text-amber-600">Dry Sift</h3><p class="text-sm text-slate-500 text-justify mt-2">Le tamisage à sec traditionnel est une technique artisanale d'extraction de résine. En frottant délicatement les fleurs séchées sur des tamis ultra-fins, on sépare les trichomes de la matière végétale. On obtient ainsi un kief pur et savoureux, apprécié pour sa grande finesse.</p></div>
+                    <div onclick="showDetail('hash_water')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-blue-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">❄️</div> <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded h-fit">PURETÉ</span> </div><h3 class="text-xl font-bold text-slate-800 group-hover:text-blue-600">Ice-O-Lator</h3><p class="text-sm text-slate-500 text-justify mt-2">Extraction à l'eau et glace (Solventless), utilise l'eau glacée pour extraire les trichomes. Le froid rend les glandes de résine cassantes, facilitant leur séparation par agitation. Le mélange est ensuite filtré à travers plusieurs sacs pour obtenir le Bubble Hash.</p></div>
+                    <div onclick="showDetail('hash_rosin')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-purple-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">🔥</div> <span class="text-xs font-bold text-purple-600 bg-purple-50 px-2 py-1 rounded h-fit">MODERNE</span> </div><h3 class="text-xl font-bold text-slate-800 group-hover:text-purple-600">Rosin</h3><p class="text-sm text-slate-500 text-justify mt-2">Une extraction 100 % naturelle obtenue par pression mécanique. En appliquant simultanément de la chaleur et une forte pression sur des fleurs ou du hash, on libère une résine pure, collante et ultra-concentrée, sans solvants chimiques.</p></div>
+                </div>
+                <h3 class="text-xl font-bold text-slate-700 mb-4 flex items-center" data-editable="fam_sub2">🌱 Fleur (Weed)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div onclick="showDetail('weed_indica')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-indigo-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">🏔️</div> <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded h-fit">RELAX</span> </div><h3 class="text-xl font-bold text-slate-800 group-hover:text-indigo-600">Indica</h3><p class="text-sm text-slate-500 text-justify mt-2">Originaire des montagnes (Kush), petite et trapue. Reconnue pour ses effets relaxants, corporels ("stone"), parfaits pour le sommeil ou la détente.</p></div>
+                    <div onclick="showDetail('weed_sativa')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-yellow-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">☀️</div> <span class="text-xs font-bold text-yellow-600 bg-yellow-50 px-2 py-1 rounded h-fit">ÉNERGIE</span> </div><h3 class="text-xl font-bold text-slate-800 group-hover:text-yellow-600">Sativa</h3><p class="text-sm text-slate-500 text-justify mt-2">Originaire des tropiques, grande et élancée. Appréciée pour ses effets cérébraux, énergisants ("high"), stimulant la créativité.</p></div>
+                    <div onclick="showDetail('weed_exotic')" class="bg-white p-6 rounded-xl shadow-md border-t-4 border-pink-500 card-interactive group"><div class="flex justify-between"> <div class="text-4xl mb-4">🧬</div> <span class="text-xs font-bold text-pink-600 bg-pink-50 px-2 py-1 rounded h-fit">HYBRIDE</span> </div><h3 class="text-xl font-bold text-slate-800 group-hover:text-pink-600">Exotics</h3><p class="text-sm text-slate-500 text-justify mt-2">Le haut de gamme moderne (souvent US/Cali). Croisements complexes privilégiant des arômes intenses (terpènes) et une esthétique visuelle (couleurs, trichomes).</p></div>
+                </div>
+            </section>
+
+            <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg"><h2 class="section-title" data-editable="potency_title">Échelle de Puissance</h2><p class="text-slate-600 mb-4 text-sm text-justify" data-editable="potency_desc">Comparatif des taux moyens de THC observés en laboratoire.</p><div class="chart-container"><canvas id="potencyChart"></canvas></div></div>
+                <div class="lg:col-span-1 bg-emerald-50 border-l-4 border-emerald-500 p-6 rounded-r-xl"><h4 class="font-bold text-emerald-900 text-lg mb-2" data-editable="didyouknow_title">Le Mythe du THC</h4><p class="text-sm text-emerald-800 leading-relaxed text-justify" data-editable="didyouknow_text">Attention : un taux de THC élevé (80%+) ne garantit pas une expérience "meilleure". C'est l'<strong>Effet d'Entourage</strong> qui compte : la synergie complexe entre les cannabinoïdes et les terpènes.</p><p class="text-sm text-emerald-800 leading-relaxed text-justify mt-4" data-editable="didyouknow_text">Par exemple, le <strong>Myrcène</strong> (dominant dans la OG Kush ou un Hash Afghan) ancre la relaxation physique, tandis que le <strong>Limonène</strong> (typique de la Super Lemon Haze) booste l'énergie et l'humeur.</p></div>
+            </section>
+
+            <section class="bg-white p-8 rounded-2xl shadow-xl border border-slate-100"><h2 class="section-title" data-editable="comp_title">Comparateur Interactif</h2><div class="grid grid-cols-1 md:grid-cols-3 gap-8"><div class="space-y-6 flex flex-col justify-center bg-slate-50 p-6 rounded-xl"><div><label class="block text-sm font-bold text-slate-700 mb-2">Produit A</label><select id="selectA" class="w-full p-3 rounded border border-slate-300 bg-white outline-none" onchange="updateComparator()"></select></div><div><label class="block text-sm font-bold text-slate-700 mb-2">Produit B</label><select id="selectB" class="w-full p-3 rounded border border-slate-300 bg-white outline-none" onchange="updateComparator()"></select></div></div><div class="md:col-span-2"><div class="chart-container"><canvas id="comparatorRadar"></canvas></div></div></div></section>
+            <section class="bg-white p-6 rounded-xl shadow-md"><h2 class="section-title" data-editable="matrix_title">Texture vs Pureté</h2><div id="globalMatrixPlot" class="w-full h-[500px]"></div></section>
+
+            <section class="bg-slate-900 text-slate-300 p-8 rounded-xl">
+                <h2 class="section-title !text-white" data-editable="lex_title">Lexique du Connaisseur</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-sm text-justify">
+                    <div><strong class="block text-emerald-400 mb-1">Trichomes</strong><span data-editable="lex_1">Les glandes résineuses microscopiques en forme de champignon qui recouvrent la fleur. C'est l'usine chimique de la plante.</span></div>
+                    <div><strong class="block text-emerald-400 mb-1">Terpènes</strong><span data-editable="lex_2">Composés aromatiques volatils (Limonène, Pinène...). Ils définissent l'odeur et orientent l'effet (sédatif ou stimulant).</span></div>
+                    <div><strong class="block text-emerald-400 mb-1">Full Melt</strong><span data-editable="lex_3">Un gage de pureté extrême pour un hash (souvent Water Hash) qui fond totalement à la chaleur sans laisser aucun résidu (6 étoiles).</span></div>
+                    <div><strong class="block text-emerald-400 mb-1">Solventless</strong><span data-editable="lex_4">Méthodes d'extraction mécaniques utilisant uniquement l'eau, la glace, la chaleur et la pression. Aucune chimie.</span></div>
+                    <div><strong class="block text-emerald-400 mb-1">Fresh Frozen</strong><span data-editable="lex_5">Plante congelée immédiatement après récolte (sans séchage) pour préserver les terpènes volatils "vivants" (Live Resin/Rosin).</span></div>
+                    <div><strong class="block text-emerald-400 mb-1">WPFF (Whole Plant)</strong><span data-editable="lex_6">Acronyme de "Whole Plant Fresh Frozen". Désigne le summum de la qualité : contrairement au Fresh Frozen standard, on congèle ici la plante entière.</span></div>
+                    <div><strong class="block text-emerald-400 mb-1">Curing</strong><span data-editable="lex_7">Processus d'affinage lent en bocal hermétique. Crucial pour stabiliser l'humidité et développer la complexité aromatique.</span></div>
+                    <div><strong class="block text-emerald-400 mb-1">Pheno Hunting</strong><span data-editable="lex_8">L'art de sélectionner la meilleure plante (le meilleur phénotype) parmi des centaines de graines d'une même variété.</span></div>
+                    <div><strong class="block text-emerald-400 mb-1">Wash</strong><span data-editable="lex_9">Action de laver la matière végétale dans de l'eau glacée pour en détacher les trichomes (pour faire du Bubble Hash).</span></div>
+                </div>
+            </section>
+
+            <div id="custom-sections-container" class="space-y-16"></div>
+            <div id="add-section-area" class="hidden text-center py-10 border-t-2 border-dashed border-slate-300 mt-12"><button onclick="openSectionModal()" class="bg-amber-500 hover:bg-amber-600 text-white px-8 py-4 rounded-full font-bold shadow-lg transition transform hover:scale-105 mx-auto">+ Ajouter une Section</button></div>
+        </div>
+
+        <!-- ==================== VIEW: DETAIL ==================== -->
+        <div id="view-detail" class="hidden fade-in space-y-8 pb-12">
+            <div id="detail-header" class="bg-white p-8 rounded-2xl shadow-lg border-t-8">
+                <div class="flex justify-between items-center mb-6"><div><span id="detail-badge" class="px-3 py-1 rounded-full text-sm font-bold uppercase tracking-wider mb-2 inline-block">Badge</span><h2 id="detail-title" class="text-4xl md:text-5xl font-black text-slate-800">Title</h2></div><div class="text-5xl opacity-20" id="detail-icon">icon</div></div><p id="detail-desc" class="text-lg text-slate-600 leading-relaxed border-l-4 border-slate-200 pl-4 text-justify">Desc</p>
+            </div>
+            <section class="bg-slate-800 text-white p-8 rounded-2xl shadow-xl"><h3 class="text-2xl font-bold mb-6">Processus</h3><div id="detail-flow" class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center"></div></section>
+            <section class="grid grid-cols-1 lg:grid-cols-2 gap-8"><div class="bg-white p-6 rounded-xl shadow-md"><div class="chart-container"><canvas id="detailRadarChart"></canvas></div></div><div class="bg-white p-6 rounded-xl shadow-md"><div class="chart-container"><canvas id="detailBarChart"></canvas></div></div></section>
+        </div>
+
+        <!-- ==================== VIEW: COLLECTION ==================== -->
+        <div id="view-collection" class="hidden fade-in pb-20">
+            <!-- BARRE AMIS -->
+            <div class="mb-6 flex items-center justify-between border-b border-slate-200 pb-4 bg-white p-4 rounded-xl shadow-sm">
+                <span class="text-xs font-bold text-emerald-500 uppercase tracking-widest flex items-center gap-2"><span>👥</span> Collaboratif</span>
+                <div id="friends-list" class="flex items-center gap-2">
+                    <div onclick="promptAddFriend()" class="friend-avatar add-btn" title="Ajouter un ami">+</div>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-emerald-900">Mon Portfolio</h2>
+                <button onclick="openCollectionForm()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold shadow-md hover:bg-emerald-500 transition flex items-center gap-2">+ Ajouter</button>
+            </div>
+            <div id="loading-indicator" class="hidden text-center py-10 text-slate-500 font-bold">Chargement des archives...</div>
+            <div id="collection-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            <div id="empty-state" class="hidden text-center py-20 text-slate-400"><div class="text-6xl mb-4">📭</div><p>Votre collection est vide.</p></div>
+        </div>
+
+        <!-- ==================== VIEW: FRIEND PORTFOLIO ==================== -->
+        <div id="view-friend" class="hidden fade-in pb-20">
+            <div class="bg-blue-600 text-white p-6 rounded-2xl shadow-lg mb-6">
+                <h2 class="text-3xl font-bold mb-2">Portfolio de <span id="friend-view-name">Ami</span></h2>
+                <p class="text-blue-200 text-sm">Mode lecture seule.</p>
+            </div>
+            <div id="friend-collection-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            <div id="friend-empty-state" class="hidden text-center py-20 text-slate-400"><div class="text-6xl mb-4">🔒</div><p>Aucune entrée visible.</p></div>
+        </div>
+
+        <!-- ==================== VIEW: INFO (MODIFIÉ: STOCKAGE + ID) ==================== -->
+        <div id="view-info" class="hidden fade-in space-y-8">
+            <div class="bg-white p-6 rounded-2xl shadow-lg border-l-8 border-emerald-600">
+                <h2 class="text-2xl font-black text-slate-800 mb-6 flex items-center gap-3">ℹ️ Informations & Aide</h2>
+                
+                <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100 relative mb-8">
+                    <!-- ID Display -->
+                    <div class="text-center mb-6">
+                        <p class="text-[10px] uppercase text-emerald-600 mb-1 font-bold tracking-widest">Mon ID Unique</p>
+                        <div class="font-mono text-sm text-slate-600 bg-slate-100 p-2 rounded border border-slate-200 truncate max-w-[250px] mx-auto select-all mb-2" id="my-uid-display">
+                            Connexion au Cloud...
+                        </div>
+                        <div class="flex justify-center gap-3">
+                            <button id="btn-copy-id" onclick="copyToClipboard()" class="bg-white border border-slate-300 text-slate-600 px-3 py-1 rounded-lg text-xs font-bold shadow-sm hover:bg-slate-50 flex items-center gap-1 transition-all">📋 Copier</button>
+                            <button onclick="shareId()" class="bg-emerald-600 text-white px-3 py-1 rounded-lg text-xs font-bold shadow-sm hover:bg-emerald-500 flex items-center gap-1 transition-all">📤 Partager</button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 border-t border-emerald-200 pt-4">
+                        <div class="border-r border-emerald-200 pr-2">
+                            <h3 class="text-[10px] font-bold text-emerald-700 uppercase tracking-widest mb-1">Installée</h3>
+                            <div class="font-mono text-xs font-bold text-slate-700 break-all" id="info-local-hash">-</div>
+                            <p class="text-[10px] text-emerald-500 mt-1" id="info-local-date">Date inconnue</p>
+                        </div>
+                        <div class="pl-2 text-right">
+                             <div class="flex items-center justify-end gap-2 mb-1">
+                                <span class="text-[10px] font-bold text-emerald-700 uppercase">GitHub</span>
+                                <div id="connection-status" class="w-2 h-2 rounded-full bg-gray-400"></div>
+                            </div>
+                            <div class="font-mono text-xs font-bold text-emerald-600 break-all" id="info-remote-hash">...</div>
+                        </div>
+                    </div>
+                    <button onclick="forceUpdate()" class="mt-4 w-full bg-emerald-600 text-white font-bold py-2 rounded-lg hover:bg-emerald-500 transition text-sm flex justify-center items-center gap-2"><span>🔄</span> Vérifier maintenant</button>
+                </div>
+
+                <!-- STOCKAGE (NOUVEAU) -->
+                <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl relative shadow-sm mb-4">
+                    <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2 mb-2">💾 État du Stockage Local</h3>
+                    <div class="flex justify-between items-end">
+                        <div class="text-xs text-slate-500">
+                            Données (Photos HD + Textes) <br>stockées sécurisées dans IndexedDB.
+                        </div>
+                        <div class="text-xl font-black text-emerald-600" id="info-storage-size">Calcul...</div>
+                    </div>
+                </div>
+
+                <!-- README -->
+                <div id="readme-card" class="bg-white border border-slate-200 p-4 rounded-xl relative shadow-sm transition-all duration-300">
+                    <div class="cursor-pointer flex items-center gap-2 mb-0" onclick="toggleSection('readme-card')"><span class="text-2xl">💡</span><h3 class="font-bold text-slate-800 text-lg">À propos de Green Codex</h3></div>
+                    <div class="collapsible-wrapper">
+                        <div class="text-sm text-slate-600 text-justify leading-relaxed mt-4 mb-4 border-t border-slate-100 pt-4">
+                            <p class="mb-2"><strong>Green Codex</strong> est votre compagnon d'exploration cannabique. Elle a été conçue pour combler le fossé entre la science botanique et l'expérience utilisateur.</p>
+                            <p>Connectée en permanence à GitHub, l'application évolue sans cesse tout en garantissant que vos données personnelles restent stockées localement.</p>
+                        </div>
+                        <button onclick="openTutorial()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-xl shadow-md transition text-sm w-full flex justify-center items-center gap-2">🎓 Lancer le Tutoriel Interactif</button>
+                    </div>
+                    <button onclick="toggleSection('readme-card')" class="absolute bottom-2 left-2 text-slate-400 p-2 hover:bg-slate-100 rounded-full transition"><svg class="w-6 h-6 toggle-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- UPDATE MODULE -->
+    <div id="updateContainer"><div id="updateAlert"><span class="update-text">Mise à jour 🚀</span><span class="arrow-pointer">➜</span></div><button id="refreshBtn" onclick="forceUpdate()"><div class="update-dot" id="updateDot"></div>&#x21bb;</button></div>
+    <!-- WHATS NEW MODULE -->
+    <div id="wn-overlay"><div id="wn-modal"><div class="wn-header"><span id="wn-badge-text" class="wn-badge">Mise à jour détectée</span><h2 id="wn-main-title" class="wn-title">Quoi de neuf ?</h2></div><div id="wn-content" class="wn-slides-container"><div class="wn-loader"></div></div><div id="wn-dots" class="wn-dots"></div><button id="wn-btn" onclick="nextSlide()" style="display:none">Suivant ➜</button></div></div>
+
+    <!-- MODAL: COLLECTION FORM -->
+    <div id="collection-modal" class="hidden fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
+            <h3 id="modal-title" class="text-2xl font-bold text-slate-800 mb-6">Ajouter à la collection</h3>
+            <form id="collection-form" onsubmit="handleCollectionSubmit(event)" class="space-y-4">
+                <input type="hidden" name="editId" id="editId" value="">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1"><label class="text-xs font-bold text-slate-500 uppercase">Catégorie</label><select name="category" id="inp-category" class="input-field" onchange="toggleFormFields(this.value)"><option value="weed">🥦 Weed</option><option value="hash">🍫 Hash</option></select></div>
+                    <div class="space-y-1"><label class="text-xs font-bold text-slate-500 uppercase">Quantité (g)</label><input type="number" step="0.1" name="quantity" id="inp-quantity" class="input-field" placeholder="ex: 3.5"></div>
+                </div>
+                <div id="hash-fields" class="hidden bg-amber-50 p-3 rounded-lg border border-amber-100 mb-2"><label class="text-xs font-bold text-amber-600 uppercase mb-1">Type de Hash</label><input type="text" name="hashType" id="inp-hashType" class="input-field border-amber-200" placeholder="ex: Dry Sift..."></div>
+                <div class="space-y-1"><label class="text-xs font-bold text-slate-500 uppercase">Variété (Strain)</label><input type="text" name="strain" id="inp-strain" class="input-field font-bold" placeholder="ex: Gelato #41" required></div>
+                <div class="space-y-1"><label class="text-xs font-bold text-slate-500 uppercase">Nom Commercial</label><input type="text" name="commercialName" id="inp-commercialName" class="input-field" placeholder="ex: Blue Magic"></div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1"><label class="text-xs font-bold text-slate-500 uppercase">Pays</label><input type="text" name="country" id="inp-country" class="input-field" placeholder="ex: Pays-Bas"></div>
+                    <div class="space-y-1"><label class="text-xs font-bold text-slate-500 uppercase">Prix (€)</label><input type="number" name="price" id="inp-price" class="input-field" placeholder="ex: 50"></div>
+                </div>
+                <div class="space-y-1"><label class="text-xs font-bold text-slate-500 uppercase">Date d'ajout</label><input type="date" name="date" id="inp-date" class="input-field"></div>
+                <div class="space-y-1"><label class="text-xs font-bold text-slate-500 uppercase">Observations</label><textarea name="observation" id="inp-observation" class="input-field" placeholder="Effets, saveurs, notes personnelles..." rows="3"></textarea></div>
+                <div class="space-y-1"><label class="text-xs font-bold text-slate-500 uppercase">Photos (HD Illimité)</label><div class="flex gap-2 items-center"><label class="w-20 h-20 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 transition text-slate-400"><span class="text-2xl">+</span><input type="file" id="photo-input" class="hidden" accept="image/*" multiple onchange="handlePhotos(this)"></label><div id="photo-preview-list" class="flex gap-2 overflow-x-auto"></div></div></div>
+                <div class="flex gap-3 pt-4"><button type="button" onclick="closeCollectionForm()" class="flex-1 py-3 rounded-xl border border-slate-300 text-slate-500 font-bold">Annuler</button><button type="submit" class="flex-1 py-3 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-500">Sauvegarder</button></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: SECTION ADD -->
+    <div id="section-modal" class="hidden fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"><div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6"><h3 class="text-2xl font-bold text-slate-800 mb-6" id="section-modal-title">Ajouter une Section</h3><form id="section-form" onsubmit="handleSectionSubmit(event)" class="space-y-4"><input type="hidden" name="secId" id="sec-id"><div class="space-y-1"><label class="text-xs font-bold text-slate-500 uppercase">Titre</label><input type="text" name="secTitle" id="sec-title" class="input-field font-bold" required></div><div class="space-y-1"><label class="text-xs font-bold text-slate-500 uppercase">Contenu</label><textarea name="secText" id="sec-text" class="input-field" required></textarea></div><div class="space-y-1"><label class="text-xs font-bold text-slate-500 uppercase">Image</label><input type="file" id="sec-photo-input" class="input-field" accept="image/*"><div id="sec-current-image" class="mt-2 hidden"><img src="" class="h-20 rounded border"></div></div><div class="flex gap-3 pt-4"><button type="button" onclick="closeSectionModal()" class="flex-1 py-3 rounded-xl border border-slate-300 text-slate-500 font-bold">Annuler</button><button type="submit" class="flex-1 py-3 rounded-xl bg-amber-500 text-white font-bold hover:bg-amber-600">Enregistrer</button></div></form></div></div>
+
+    <!-- MODAL: COLLECTION DETAIL -->
+    <div id="collection-detail-modal" class="hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col animate-fade-in">
+            <div id="cd-img-container" class="w-full h-64 bg-slate-900 relative flex-shrink-0 group"><img id="cd-main-img" class="w-full h-full object-contain"><button onclick="closeCollectionDetail()" class="absolute top-4 right-4 bg-white/20 text-white rounded-full p-2 hover:bg-white/40 backdrop-blur-sm transition">✕</button><div id="cd-thumbs" class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 px-4 overflow-x-auto z-10"></div></div>
+            <div class="p-6 overflow-y-auto"><div class="flex justify-between items-start mb-4"><div><h2 id="cd-strain" class="text-3xl font-black text-slate-800 leading-tight">Strain</h2><p id="cd-commercial" class="text-emerald-600 font-bold uppercase text-sm tracking-wider mt-1">Commercial</p></div><div class="text-5xl" id="cd-flag">🏳️</div></div><div class="grid grid-cols-2 gap-4 mb-6"><div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center"><span class="text-[10px] uppercase text-slate-400 font-bold block">Quantité</span><span id="cd-quantity" class="text-xl font-black text-slate-700">0g</span></div><div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center"><span class="text-[10px] uppercase text-slate-400 font-bold block">Prix</span><span id="cd-price" class="text-xl font-black text-slate-700">0€</span></div><div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center"><span class="text-[10px] uppercase text-slate-400 font-bold block">Type</span><span id="cd-category" class="text-lg font-bold text-slate-700">Weed</span></div><div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center"><span class="text-[10px] uppercase text-slate-400 font-bold block">Date</span><span id="cd-date" class="text-sm font-bold text-slate-700">...</span></div></div><div id="cd-observation-container" class="bg-slate-50 p-4 rounded-xl border border-slate-100 mb-6 hidden"><h4 class="text-xs font-bold text-slate-500 uppercase mb-2">Observations</h4><p id="cd-observation" class="text-sm text-slate-700 italic text-justify"></p></div><div class="flex gap-3"><button id="cd-btn-edit" class="flex-1 py-3 rounded-xl border border-blue-200 text-blue-600 font-bold hover:bg-blue-50 transition">Modifier</button><button id="cd-btn-delete" class="flex-1 py-3 rounded-xl border border-red-200 text-red-500 font-bold hover:bg-red-50 transition">Supprimer</button></div></div>
+        </div>
+    </div>
+
+
+    <script>
+        // ============================================================
+        // 💾 INDEXEDDB MANAGER (DATABASE)
+        // ============================================================
+        const DB_NAME = 'GreenCodexDB';
+        const DB_VERSION = 1;
+        const db = {
+            instance: null,
+            init: function() { return new Promise((resolve, reject) => { const request = indexedDB.open(DB_NAME, DB_VERSION); request.onupgradeneeded = (e) => { const d = e.target.result; if(!d.objectStoreNames.contains('collection')) d.createObjectStore('collection', { keyPath: 'id', autoIncrement: true }); if(!d.objectStoreNames.contains('config')) d.createObjectStore('config', { keyPath: 'key' }); if(!d.objectStoreNames.contains('friends')) d.createObjectStore('friends', { keyPath: 'id' }); }; request.onsuccess = (e) => { this.instance = e.target.result; resolve(this.instance); }; request.onerror = (e) => reject("DB Error"); }); },
+            getAll: function(storeName) { return new Promise((resolve) => { const tx = this.instance.transaction(storeName, 'readonly'); const store = tx.objectStore(storeName); const req = store.getAll(); req.onsuccess = () => resolve(req.result); req.onerror = () => resolve([]); }); },
+            save: function(storeName, item) { return new Promise((resolve, reject) => { const tx = this.instance.transaction(storeName, 'readwrite'); const store = tx.objectStore(storeName); const req = store.put(item); req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); }); },
+            delete: function(storeName, key) { return new Promise((resolve) => { const tx = this.instance.transaction(storeName, 'readwrite'); const store = tx.objectStore(storeName); store.delete(key); tx.oncomplete = () => resolve(); }); }
+        };
+
+        // ============================================================
+        // ⚠️ CONFIGURATION GITHUB ⚠️
+        // ============================================================
+        const GITHUB_USERNAME = 'antoto2021'; 
+        const GITHUB_REPO     = 'Appli-Portfolio';        
+        const UPDATE_STORAGE_KEY = 'green_codex_last_hash';
+        const UPDATE_TIME_KEY    = 'green_codex_update_timestamp';
+
+        let firebaseInstance = null; // Store { db, user, appId }
+        let myUid = null;
+
+        // --- GLOBAL VARIABLES ---
+        let collection = [];
+        let contentMap = {};
+        let customSections = [];
+        let friends = [];
+        let isEditMode = false;
+        let currentPhotos = [];
+        let currentSectionImage = null;
+        let activeUpdates = [{ icon: "🚀", title: "Mise à jour", desc: "Nouvelle version disponible." }];
+        let currentSlide = 0;
+
+        const masterData = { 
+            hash_dry: { name: "Dry Sift", color: "amber", hex: "#D97706", badge: "Tradition", icon: "🏜️", desc: "Tamisage mécanique ancestral.", process: [{t:"Séchage",d:"Plante affinée"},{t:"Tamisage",d:"Frottement"},{t:"Collection",d:"Poudre"},{t:"Presse",d:"Chaleur"}], radar: [30,90,70,50,60], metrics: [20,50,40,30], metricsLabels: ['Rendement','Puissance','Prix','Tech'], matrix: {x:45,y:9} }, 
+            hash_water: { name: "Ice-O-Lator", color: "blue", hex: "#2563EB", badge: "Pureté", icon: "❄️", desc: "Extraction eau glacée + Fresh Frozen.", process: [{t:"Congélation",d:"-40°C"},{t:"Lavage",d:"Eau+Glace"},{t:"Filtre",d:"Sacs"},{t:"Séchage",d:"Lyophilisation"}], radar: [90,30,60,95,85], metrics: [10,75,90,80], metricsLabels: ['Rendement','Puissance','Prix','Tech'], matrix: {x:70,y:6} }, 
+            hash_rosin: { name: "Rosin", color: "purple", hex: "#9333EA", badge: "Excellence", icon: "🔥", desc: "Pression et chaleur uniquement.", process: [{t:"Matériel",d:"Hash 6*"},{t:"Sac",d:"25u Nylon"},{t:"Presse",d:"Hydraulique"},{t:"Cure",d:"Cold Cure"}], radar: [85,50,80,90,95], metrics: [15,85,100,60], metricsLabels: ['Rendement','Puissance','Prix','Tech'], matrix: {x:85,y:3} }, 
+            
+            // --- NOUVEAUX PRODUITS AJOUTÉS ---
+            hash_wpff: { name: "WPFF (Live Rosin)", color: "cyan", hex: "#06b6d4", badge: "Summum", icon: "💎", desc: "Whole Plant Fresh Frozen. Plante entière congelée vivante pour une extraction Rosin d'une richesse terpénique inégalée.", process: [{t:"Récolte",d:"Top Buds"},{t:"Surgélation",d:"Immédiat"},{t:"Lavage",d:"Ice Water"},{t:"Presse",d:"Low Temp"}], radar: [95, 20, 70, 100, 90], metrics: [8, 80, 100, 95], metricsLabels: ['Rendement','Puissance','Prix','Tech'], matrix: {x: 95, y: 2} },
+            hash_bho: { name: "BHO (Shatter/Wax)", color: "slate", hex: "#64748B", badge: "Solvant", icon: "🍯", desc: "Extraction par solvant (Butane). Très puissant, texture variée (verre ou cire).", process: [{t:"Tube",d:"Plante"},{t:"Injection",d:"Butane"},{t:"Purge",d:"Vide d'air"},{t:"Finition",d:"Shatter"}], radar: [70, 40, 80, 60, 95], metrics: [18, 90, 60, 70], metricsLabels: ['Rendement','Puissance','Prix','Tech'], matrix: {x: 80, y: 8} },
+            
+            weed_indica: { name: "Indica (Kush)", color: "indigo", hex: "#4F46E5", badge: "Relax", icon: "🏔️", desc: "Montagnes, effet lourd.", process: [{t:"Origine",d:"Hindu Kush"},{t:"Structure",d:"Buisson"},{t:"Flo",d:"8 sem"},{t:"Effet",d:"Physique"}], radar: [20,80,90,60,40], metrics: [80,22,50,90], metricsLabels: ['Rendement','THC','Taille','Facilité'], matrix: {x:20,y:10} }, 
+            weed_sativa: { name: "Sativa (Haze)", color: "yellow", hex: "#D97706", badge: "Energie", icon: "☀️", desc: "Tropiques, effet high.", process: [{t:"Origine",d:"Equateur"},{t:"Structure",d:"Géante"},{t:"Flo",d:"12+ sem"},{t:"Effet",d:"Cérébral"}], radar: [60,40,20,70,40], metrics: [90,18,100,60], metricsLabels: ['Rendement','THC','Taille','Facilité'], matrix: {x:18,y:10} }, 
+            weed_exotic: { name: "Exotics", color: "pink", hex: "#DB2777", badge: "Hybride", icon: "🧬", desc: "Breeding US moderne.", process: [{t:"Origine",d:"Indoor"},{t:"Structure",d:"Optimisée"},{t:"Flo",d:"9 sem"},{t:"Effet",d:"Mixte"}], radar: [80,50,60,80,50], metrics: [75,28,60,70], metricsLabels: ['Rendement','THC','Taille','Facilité'], matrix: {x:28,y:10} } 
+        };
+
+        const tutorialSlides = [
+            { icon: "👋", title: "Bienvenue !", desc: "Découvrez Green Codex, votre encyclopédie cannabique interactive et personnelle." },
+            { icon: "📖", title: "Encyclopédie", desc: "Explorez les fiches techniques : Indica, Sativa, Dry Sift, Rosin... Tout le savoir à portée de main." },
+            { icon: "📊", title: "Radars", desc: "Visualisez instantanément le profil aromatique et les effets grâce aux graphiques radars dynamiques." },
+            { icon: "⚖️", title: "Comparateur", desc: "Hésitation entre deux variétés ? Superposez leurs graphiques pour voir leurs différences." },
+            { icon: "📂", title: "Collection", desc: "Créez votre 'Pokedex' personnel ! Ajoutez chaque variété que vous goûtez." },
+            { icon: "📝", title: "Détails", desc: "Indiquer la farm, la strain, la quantité et le pays d'origine pour chaque entrée." },
+            { icon: "📸", title: "Photos", desc: "Immortalisez vos plus belles fleurs. Ajoutez jusqu'à 3 photos par fiche." },
+            { icon: "✏️", title: "Mode Édition", desc: "C'est VOTRE appli. Activez le mode édition (en haut) pour réécrire les textes et titres." },
+            { icon: "🔄", title: "Mises à jour", desc: "Connectée à GitHub, l'appli évolue automatiquement. Vos données restent sécurisées sur votre téléphone." },
+            { icon: "🚀", title: "C'est parti !", desc: "Vous êtes prêt. Commencez à explorer et à construire votre collection dès maintenant." }
+        ];
+
+        // --- CORE FUNCTIONS ---
+        function showView(viewId) {
+            document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+            document.getElementById('navBackBtn').classList.toggle('hidden', viewId === 'home');
+            document.getElementById('editModeBtn').classList.toggle('hidden', viewId !== 'home');
+            const infoBtn = document.querySelector('button[onclick="showView(\'info\')"]');
+            if(infoBtn) infoBtn.style.display = (viewId === 'home' || viewId === 'info') ? 'flex' : 'none';
+            window.scrollTo(0,0);
+            if(viewId === 'collection') renderCollectionList();
+            if(viewId === 'info') renderInfoView();
+        }
+
+        async function initApp() {
+            try {
+                // 1. DB LOCAL
+                await db.init();
+                collection = await db.getAll('collection');
+                friends = await db.getAll('friends');
+                renderFriendsList();
+
+                const contentConfig = (await db.getAll('config')).find(c => c.key === 'contentMap');
+                contentMap = contentConfig ? contentConfig.value : {};
+                const sectionsConfig = (await db.getAll('config')).find(c => c.key === 'customSections');
+                customSections = sectionsConfig ? sectionsConfig.value : [];
+
+                loadSavedContent();
+                updateDashboardStats();
+                initCharts();
+
+                // 2. FIREBASE (SYNC TEXT)
+                if (window.initFirebase) {
+                    firebaseInstance = await window.initFirebase();
+                    if (firebaseInstance) {
+                        myUid = firebaseInstance.user.uid;
+                        console.log("Firebase Connected. UID:", myUid);
+                    }
+                }
+
+                // 3. GITHUB CHECK
+                setTimeout(() => checkGitHubStatus(), 5000);
+
+            } catch(e) { console.error("Init Error:", e); }
+        }
+
+        // --- COLLECTION LOGIC ---
+        async function saveCollectionItem(item) {
+            const id = await db.save('collection', item);
+            item.id = id; 
+            collection = await db.getAll('collection');
+            updateDashboardStats();
+            renderCollectionList();
+            
+            // Sync to Cloud (Sans photos)
+            if(window.firebaseFuncs && firebaseInstance) {
+                try {
+                    const { setDoc, doc } = window.firebaseFuncs;
+                    const { db: firestore, appId } = firebaseInstance;
+                    const cleanItem = { ...item, photos: [] }; // Strip photos
+                    await setDoc(doc(firestore, 'artifacts', appId, 'users', myUid, 'portfolio', id.toString()), cleanItem);
+                } catch(e) { console.error("Sync Error", e); }
+            }
+        }
+
+        async function deleteCollectionItem(id) {
+            if(confirm('Supprimer cette entrée ?')) {
+                await db.delete('collection', id);
+                collection = await db.getAll('collection');
+                updateDashboardStats();
+                renderCollectionList();
+                closeCollectionDetail();
+                
+                // Delete from Cloud
+                if(window.firebaseFuncs && firebaseInstance) {
+                    try {
+                        const { deleteDoc, doc } = window.firebaseFuncs;
+                        const { db: firestore, appId } = firebaseInstance;
+                        await deleteDoc(doc(firestore, 'artifacts', appId, 'users', myUid, 'portfolio', id.toString()));
+                    } catch(e) {}
+                }
+            }
+        }
+
+        // --- FRIENDS LOGIC (LOCAL ONLY) ---
+        async function promptAddFriend() {
+            const friendId = prompt("Entrez l'ID Unique de votre ami (disponible dans l'onglet Info de son appli) :");
+            if (friendId && friendId.length > 5) {
+                const name = prompt("Donnez un petit nom à cet ami (ex: Toto) :");
+                const initial = (name || "A").charAt(0).toUpperCase();
+                
+                const friend = { id: friendId, name: name || "Ami", initial: initial };
+                await db.save('friends', friend);
+                friends = await db.getAll('friends');
+                renderFriendsList();
+            }
+        }
+
+        function renderFriendsList() {
+            const container = document.getElementById('friends-list');
+            const addBtn = container.querySelector('.add-btn');
+            container.innerHTML = '';
+            
+            friends.forEach(f => {
+                const el = document.createElement('div');
+                el.className = 'friend-avatar bg-blue-500 hover:bg-blue-600 border-2 border-white text-white shadow-sm';
+                el.innerText = f.initial;
+                el.title = f.name;
+                el.onclick = () => viewFriendPortfolio(f);
+                container.appendChild(el);
+            });
+            container.appendChild(addBtn);
+        }
+
+        async function viewFriendPortfolio(friend) {
+            if (!firebaseInstance || !window.firebaseFuncs) {
+                alert("Connexion Cloud nécessaire pour voir les amis.");
+                return;
+            }
+            
+            showView('friend');
+            document.getElementById('friend-view-name').innerText = friend.name;
+            document.getElementById('friend-collection-list').innerHTML = '<div class="col-span-full text-center py-10"><div class="wn-loader"></div><p class="mt-4 text-slate-500">Récupération du portfolio...</p></div>';
+            document.getElementById('friend-empty-state').classList.add('hidden');
+
+            try {
+                const { getDocs, collection: fsCol } = window.firebaseFuncs;
+                const { db: firestore, appId } = firebaseInstance;
+                
+                const snapshot = await getDocs(fsCol(firestore, 'artifacts', appId, 'users', friend.id, 'portfolio'));
+                const friendItems = [];
+                snapshot.forEach(doc => friendItems.push(doc.data()));
+                
+                renderFriendCollection(friendItems);
+            } catch (e) {
+                console.error(e);
+                alert("Impossible de charger ce portfolio. L'ID est peut-être incorrect.");
+                showView('home');
+            }
+        }
+
+        function renderFriendCollection(items) {
+            const container = document.getElementById('friend-collection-list');
+            container.innerHTML = '';
+            
+            if (items.length === 0) {
+                document.getElementById('friend-empty-state').classList.remove('hidden');
+                return;
+            }
+
+            items.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            items.forEach(item => {
+                const html = `
+                <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 flex gap-4 opacity-90">
+                    <div class="w-20 h-20 rounded-lg bg-slate-100 flex-shrink-0 flex items-center justify-center text-3xl opacity-50">
+                        ${item.category === 'hash' ? '🍫' : '🥦'}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-bold text-slate-800 truncate pr-2">${item.strain}</h3>
+                            <span class="text-xl">${getFlag(item.country)}</span>
+                        </div>
+                        <p class="text-xs text-slate-500 font-bold uppercase mb-1">${item.commercialName || 'Inconnu'}</p>
+                        ${item.type ? `<span class="bg-amber-100 text-amber-800 text-[10px] px-1.5 py-0.5 rounded border border-amber-200 block w-fit mb-1">${item.type}</span>` : ''}
+                        <div class="flex items-center gap-2 mt-2">
+                             <span class="bg-emerald-50 text-emerald-700 text-xs px-2 py-1 rounded font-bold">${item.quantity}g</span>
+                             <span class="text-[10px] text-slate-400 ml-auto">${new Date(item.date).toLocaleDateString()}</span>
+                        </div>
+                        ${item.observation ? `<p class="mt-2 text-xs text-slate-600 italic border-t pt-1 truncate">"${item.observation}"</p>` : ''}
+                    </div>
+                </div>`;
+                container.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        // --- UTILS ---
+        function compressImage(f,w=1200,q=0.8){return new Promise(r=>{const R=new FileReader();R.onload=e=>{const i=new Image();i.onload=()=>{const c=document.createElement('canvas');let W=i.width,H=i.height;if(W>w){H*=w/W;W=w}c.width=W;c.height=H;c.getContext('2d').drawImage(i,0,0,W,H);r(c.toDataURL('image/jpeg',q))};i.src=e.target.result};R.readAsDataURL(f)})}
+        function toggleEditMode(){isEditMode=!isEditMode;document.body.classList.toggle('edit-mode-active',isEditMode);document.getElementById('edit-banner').classList.toggle('hidden',!isEditMode);document.getElementById('editModeBtn').classList.toggle('bg-amber-500',isEditMode);document.getElementById('add-section-area').classList.toggle('hidden',!isEditMode);document.querySelectorAll('[data-editable]').forEach(e=>{if(isEditMode){e.classList.add('editable-highlight');e.onclick=ev=>{ev.preventDefault();ev.stopPropagation();editContent(ev.target.closest('[data-editable]'))}}else{e.classList.remove('editable-highlight');e.onclick=null}});renderCustomSections()}
+        async function editContent(e){if(!isEditMode||!e)return;const k=e.getAttribute('data-editable'),t=prompt("Modifier:",e.innerText);if(t!==null&&t!==e.innerText){e.innerText=t;contentMap[k]=t;await db.save('config',{key:'contentMap',value:contentMap})}}
+        function loadSavedContent(){document.querySelectorAll('[data-editable]').forEach(e=>{const k=e.getAttribute('data-editable');if(contentMap[k])e.innerText=contentMap[k]});renderCustomSections()}
+        
+        // --- STORAGE CALCULATOR (IMPROVED) ---
+        function calculateStorageUsage() {
+            // Estimation plus précise
+            const colBlob = new Blob([JSON.stringify(collection)]);
+            const contentBlob = new Blob([JSON.stringify(contentMap)]);
+            const sectBlob = new Blob([JSON.stringify(customSections)]);
+            
+            const totalBytes = colBlob.size + contentBlob.size + sectBlob.size;
+            
+            let sizeStr = "";
+            if (totalBytes < 1024) sizeStr = totalBytes + " B";
+            else if (totalBytes < 1024 * 1024) sizeStr = (totalBytes / 1024).toFixed(1) + " Ko";
+            else sizeStr = (totalBytes / (1024 * 1024)).toFixed(2) + " Mo";
+
+            const el = document.getElementById('info-storage-size');
+            if (el) el.innerText = sizeStr;
+            
+            // Update also in collection header if present
+            const el2 = document.getElementById('storage-used');
+            if(el2) el2.innerText = `(${sizeStr})`;
+        }
+
+        function updateDashboardStats(){document.getElementById('stats-total').innerText=collection.length;document.getElementById('stats-weed').innerText=collection.filter(i=>i.category==='weed').length;document.getElementById('stats-hash').innerText=collection.filter(i=>i.category==='hash').length;document.getElementById('stats-mass').innerText=collection.reduce((a,c)=>a+(parseFloat(c.quantity)||0),0).toFixed(1)+'g'; calculateStorageUsage();}
+        function renderCollectionList(){const c=document.getElementById('collection-list');c.innerHTML='';document.getElementById('empty-state').classList.toggle('hidden',collection.length>0);[...collection].reverse().forEach(i=>{const p=i.photos&&i.photos.length?`<img src="${i.photos[0]}" class="w-full h-full object-cover">`:`<div class="w-full h-full flex items-center justify-center text-3xl opacity-30">${i.category==='hash'?'🍫':'🥦'}</div>`;const h=`<div onclick="openCollectionDetail(${i.id})" class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 flex gap-4 relative group hover:border-emerald-300 transition cursor-pointer"><div class="w-20 h-20 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden relative">${p}</div><div class="flex-1 min-w-0"><div class="flex justify-between items-start"><h3 class="font-bold text-slate-800 truncate pr-2">${i.strain}</h3><span class="text-xl">${getFlag(i.country)}</span></div><p class="text-xs text-slate-500 font-bold uppercase mb-1">${i.commercialName||'Inconnu'}</p>${i.type?`<span class="bg-amber-100 text-amber-800 text-[10px] px-1.5 py-0.5 rounded border border-amber-200 block w-fit mb-1">${i.type}</span>`:''}<div class="flex items-center gap-2 mt-2"><span class="bg-emerald-50 text-emerald-700 text-xs px-2 py-1 rounded font-bold">${i.quantity}g</span></div></div></div>`;c.insertAdjacentHTML('beforeend',h)})}
+        
+        function openCollectionForm(id=null){const f=document.getElementById('collection-form');f.reset();document.getElementById('editId').value=id||"";currentPhotos=[];const d=new Date().toISOString().split('T')[0];document.getElementById('inp-date').value=d;if(id){const i=collection.find(x=>x.id==id);if(i){document.getElementById('inp-category').value=i.category;document.getElementById('inp-quantity').value=i.quantity;document.getElementById('inp-strain').value=i.strain;document.getElementById('inp-commercialName').value=i.commercialName;document.getElementById('inp-country').value=i.country;document.getElementById('inp-price').value=i.price;if(i.type)document.getElementById('inp-hashType').value=i.type;document.getElementById('inp-observation').value=i.observation||"";if(i.date)document.getElementById('inp-date').value=i.date.split('T')[0];toggleFormFields(i.category);if(i.photos)currentPhotos=[...i.photos]}}else{toggleFormFields('weed')}renderPhotoPreviews();document.getElementById('collection-modal').classList.remove('hidden')}
+        async function handleCollectionSubmit(e){e.preventDefault();const f=new FormData(e.target),eid=document.getElementById('editId').value,dr=f.get('date'),do_=dr?new Date(dr+'T12:00:00'):new Date();const i={category:f.get('category'),quantity:f.get('quantity'),strain:f.get('strain'),commercialName:f.get('commercialName'),type:f.get('hashType'),country:f.get('country'),price:f.get('price'),observation:f.get('observation'),photos:currentPhotos,date:do_.toISOString()};if(eid)i.id=parseInt(eid);await saveCollectionItem(i);closeCollectionForm()}
+        function closeCollectionForm(){document.getElementById('collection-modal').classList.add('hidden')}
+        async function handlePhotos(i){if(i.files){for(const f of i.files){try{currentPhotos.push(await compressImage(f,1200,0.8))}catch{}}renderPhotoPreviews()}}
+        function renderPhotoPreviews(){document.getElementById('photo-preview-list').innerHTML=currentPhotos.map((s,i)=>`<div class="w-20 h-20 rounded-xl relative overflow-hidden group flex-shrink-0"><img src="${s}" class="w-full h-full object-cover"><button type="button" onclick="currentPhotos.splice(${i},1);renderPhotoPreviews()" class="absolute top-0 right-0 bg-red-500 text-white text-xs p-1 opacity-0 group-hover:opacity-100">X</button></div>`).join('')}
+        
+        function openCollectionDetail(id){const i=collection.find(x=>x.id==id);if(!i)return;document.getElementById('cd-strain').innerText=i.strain;document.getElementById('cd-commercial').innerText=i.commercialName||'Sans nom';document.getElementById('cd-flag').innerText=getFlag(i.country);document.getElementById('cd-quantity').innerText=i.quantity+'g';document.getElementById('cd-price').innerText=i.price+'€';document.getElementById('cd-category').innerText=i.category==='hash'?'Hash 🍫':'Weed 🥦';document.getElementById('cd-date').innerText=new Date(i.date).toLocaleDateString();if(i.observation){document.getElementById('cd-observation').innerText=i.observation;document.getElementById('cd-observation-container').classList.remove('hidden')}else{document.getElementById('cd-observation-container').classList.add('hidden')}document.getElementById('cd-btn-edit').onclick=()=>{closeCollectionDetail();openCollectionForm(id)};document.getElementById('cd-btn-delete').onclick=()=>{deleteCollectionItem(id)};const m=document.getElementById('cd-main-img'),t=document.getElementById('cd-thumbs');t.innerHTML='';if(i.photos&&i.photos.length>0){m.src=i.photos[0];m.classList.remove('opacity-30','p-10');if(i.photos.length>1){i.photos.forEach(s=>{const el=document.createElement('img');el.src=s;el.className="w-12 h-12 rounded-lg border-2 border-white/50 cursor-pointer object-cover";el.onclick=()=>m.src=s;t.appendChild(el)})}}else{m.src=""}document.getElementById('collection-detail-modal').classList.remove('hidden')}
+        function closeCollectionDetail(){document.getElementById('collection-detail-modal').classList.add('hidden')}
+        function openSectionModal(id=null){document.getElementById('section-form').reset();document.getElementById('sec-current-image').classList.add('hidden');currentSectionImage=null;if(id){const s=customSections.find(x=>x.id===id);document.getElementById('sec-id').value=s.id;document.getElementById('sec-title').value=s.title;document.getElementById('sec-text').value=s.text;if(s.image){currentSectionImage=s.image;document.querySelector('#sec-current-image img').src=s.image;document.getElementById('sec-current-image').classList.remove('hidden')}}document.getElementById('section-modal').classList.remove('hidden')}
+        function closeSectionModal(){document.getElementById('section-modal').classList.add('hidden')}
+        async function handleSectionSubmit(e){e.preventDefault();const f=e.target,id=f.secId.value?parseInt(f.secId.value):Date.now(),fi=document.getElementById('sec-photo-input').files[0];if(fi)currentSectionImage=await compressImage(fi,800,0.7);const s={id,title:f.secTitle.value,text:f.secText.value,image:currentSectionImage},i=customSections.findIndex(x=>x.id===id);if(i>-1)customSections[i]=s;else customSections.push(s);await db.save('config',{key:'customSections',value:customSections});renderCustomSections();closeSectionModal()}
+        async function deleteCustomSection(id){if(confirm('Supprimer ?')){customSections=customSections.filter(x=>x.id!==id);await db.save('config',{key:'customSections',value:customSections});renderCustomSections()}}
+        function renderCustomSections(){document.getElementById('custom-sections-container').innerHTML=customSections.map((s,i)=>`<section class="bg-white rounded-2xl shadow-md p-8 border-l-8 border-emerald-600 relative group animate-fade-in text-justify">${isEditMode?`<div class="absolute top-4 right-4 flex gap-2"><button onclick="openSectionModal(${s.id})" class="text-blue-500 font-bold border border-blue-200 px-3 py-1 rounded hover:bg-blue-50 text-xs">Modifier</button><button onclick="deleteCustomSection(${s.id})" class="text-red-500 font-bold border border-red-200 px-3 py-1 rounded hover:bg-red-50 text-xs">Supprimer</button></div>`:''}<h2 class="section-title">${i+8}. ${s.title}</h2>${s.image?`<img src="${s.image}" class="w-full max-h-96 object-cover rounded-xl mb-6 shadow-sm">`:''}<div class="text-lg leading-relaxed text-slate-600 whitespace-pre-wrap">${s.text}</div></section>`).join('')}
+        async function checkGitHubStatus(){if(GITHUB_USERNAME==='antoto2021')console.log("GitHub Check");const c=await fetchLatestCommit();if(!c)return;const rh=c.sha,sh=localStorage.getItem(UPDATE_STORAGE_KEY);if(!sh){localStorage.setItem(UPDATE_STORAGE_KEY,rh);localStorage.setItem(UPDATE_TIME_KEY,Date.now())}else if(sh!==rh){triggerUpdateUI();const p=parseCommitMessage(c.commit.message);if(p.length>0)activeUpdates=p}}
+        async function fetchLatestCommit(){try{const r=await fetch(`https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/commits?per_page=1&t=${Date.now()}`);if(!r.ok)return null;const d=await r.json();return d[0]}catch{return null}}
+        function triggerUpdateUI(){document.getElementById('updateDot').style.display='block';document.getElementById('updateAlert').style.display='flex';const a=document.querySelector('.arrow-pointer');a.classList.remove('bouncing');void a.offsetWidth;a.classList.add('bouncing')}
+        function forceUpdate(){document.getElementById('refreshBtn').classList.add('rotating');setTimeout(()=>{const u=window.location.href.split('?')[0];window.location.href=u+'?v='+Date.now()},500)}
+        async function handlePostUpdate(){const c=await fetchLatestCommit();if(!c)return;const rh=c.sha,sh=localStorage.getItem(UPDATE_STORAGE_KEY);if(sh===rh){const u=new URL(window.location.href);u.searchParams.delete('v');window.history.replaceState({},document.title,u.toString());return}const o=document.getElementById('wn-overlay');o.style.display='flex';setTimeout(()=>o.classList.add('show-modal'),10);localStorage.setItem(UPDATE_STORAGE_KEY,rh);localStorage.setItem(UPDATE_TIME_KEY,Date.now());const p=parseCommitMessage(c.commit.message);if(p.length>0)activeUpdates=p;renderSlides();updateSlideUI();document.getElementById('wn-btn').style.display='flex'}
+        function parseCommitMessage(m){const l=m.split('\n'),u=[],r=/(\p{Emoji_Presentation}|\p{Extended_Pictographic})/gu;l.forEach(x=>{const c=x.trim();if(c.match(/^[*+-]\s/)){let t=c.substring(2).trim(),p=t.split(':');if(p.length>=2){const tp=p[0].trim(),dp=p.slice(1).join(':').trim();let i="✨",tt=tp;const ma=tp.match(r);if(ma&&tp.indexOf(ma[0])===0){i=ma[0];tt=tp.replace(ma[0],'').trim()}u.push({icon:i,title:tt,desc:dp})}}});return u}
+        function renderSlides(){const c=document.getElementById('wn-content'),d=document.getElementById('wn-dots');if(activeUpdates.length===0){c.innerHTML=`<div class="wn-slide" style="display:block">...</div>`;return}c.innerHTML=activeUpdates.map((s,i)=>`<div class="wn-slide" id="slide-${i}"><span class="wn-icon">${s.icon}</span><span class="wn-slide-title">${s.title}</span><p class="wn-desc">${s.desc}</p></div>`).join('');d.innerHTML=activeUpdates.map((_,i)=>`<div class="wn-dot" id="dot-${i}"></div>`).join('')}
+        function updateSlideUI(){document.querySelectorAll('.wn-slide').forEach((e,i)=>{e.style.display=i===currentSlide?'block':'none'});document.querySelectorAll('.wn-dot').forEach((e,i)=>{if(i===currentSlide)e.classList.add('active');else e.classList.remove('active')});const b=document.getElementById('wn-btn');if(currentSlide===activeUpdates.length-1){b.innerHTML="Compris ✅";b.style.backgroundColor="#166534"}else{b.innerHTML="Suivant ➜";b.style.backgroundColor="#15803d"}}
+        function nextSlide(){if(currentSlide<activeUpdates.length-1){currentSlide++;updateSlideUI()}else{closePopup()}}
+        function closePopup(){const o=document.getElementById('wn-overlay');o.classList.remove('show-modal');setTimeout(()=>{o.style.display='none';const u=new URL(window.location.href);if(u.searchParams.has('v')){u.searchParams.delete('v');window.history.replaceState({},document.title,u.toString())}},300)}
+        function openTutorial(){activeUpdates=tutorialSlides;currentSlide=0;const b=document.getElementById('wn-badge-text');b.innerText="Tutoriel";b.style.backgroundColor="#F59E0B";b.style.color="#fff";document.getElementById('wn-main-title').innerText="Guide";const o=document.getElementById('wn-overlay');o.style.display='flex';setTimeout(()=>o.classList.add('show-modal'),10);renderSlides();updateSlideUI();document.getElementById('wn-btn').style.display='flex'}
+        function toggleSection(id){const e=document.getElementById(id);if(e)e.classList.toggle('expanded')}
+        async function renderInfoView(){const lh=localStorage.getItem(UPDATE_STORAGE_KEY)||'Aucun';document.getElementById('info-local-hash').innerText=lh.substring(0,7)+'...';const lt=localStorage.getItem(UPDATE_TIME_KEY);if(lt){const d=Math.floor((Date.now()-parseInt(lt))/60000);document.getElementById('info-local-date').innerText=`Il y a ${d} min`}const sd=document.getElementById('connection-status'),re=document.getElementById('info-remote-hash');re.innerText="...";sd.className="w-2 h-2 rounded-full bg-gray-400";const rc=await fetchLatestCommit();if(rc){re.innerText=rc.sha.substring(0,7)+'...';sd.classList.remove('bg-gray-400');sd.classList.add('bg-green-500')}else{re.innerText="Offline";sd.classList.remove('bg-gray-400');sd.classList.add('bg-red-500')}if(myUid)document.getElementById('my-uid-display').innerText=myUid}
+        
+        function copyToClipboard(){const t=document.getElementById('my-uid-display').innerText;if(!t||t.includes('...'))return;const b=document.getElementById('btn-copy-id'),o=b.innerHTML;if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(()=>{b.innerHTML="✅ Copié !";setTimeout(()=>b.innerHTML=o,2000)})}else{const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();document.execCommand("copy");document.body.removeChild(a);b.innerHTML="✅ Copié !";setTimeout(()=>b.innerHTML=o,2000)}}
+        function shareId(){const t=document.getElementById('my-uid-display').innerText;if(!t||t.includes('...'))return;if(navigator.share){navigator.share({title:'Mon ID Green Codex',text:`Voici mon ID unique pour voir ma collection Green Codex : ${t}`}).catch(console.error)}else{copyToClipboard()}}
+
+        function getFlag(c){if(!c)return'🏳️';const m={'france':'🇫🇷','espagne':'🇪🇸','spain':'🇪🇸','usa':'🇺🇸','cali':'🇺🇸','maroc':'🇲🇦','morocco':'🇲🇦','suisse':'🇨🇭','italie':'🇮🇹','canada':'🇨🇦','uk':'🇬🇧','angleterre':'🇬🇧','allemagne':'🇩🇪','thailande':'🇹🇭','pays-bas':'🇳🇱','hollande':'🇳🇱','netherlands':'🇳🇱','belgique':'🇧🇪'};for(let k in m)if(c.toLowerCase().includes(k))return m[k];return'🏳️'}
+        function toggleFormFields(c){document.getElementById('hash-fields').classList.toggle('hidden',c!=='hash')}
+        const initCharts=()=>{new Chart(document.getElementById('potencyChart'),{type:'bar',data:{labels:['Sativa','Indica','Exotic','Dry Sift','Ice-O-Lator','Rosin','BHO'],datasets:[{label:'% THC',data:[15,20,28,40,65,75,90],backgroundColor:['#10B981','#10B981','#10B981','#D97706','#2563EB','#9333EA','#64748B'],borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:false}}});updateComparator();Plotly.newPlot('globalMatrixPlot',[{x:Object.values(masterData).map(d=>d.matrix.x),y:Object.values(masterData).map(d=>d.matrix.y),text:Object.values(masterData).map(d=>d.name),mode:'markers+text',type:'scatter',textposition:'top center',marker:{size:30,color:Object.values(masterData).map(d=>d.hex)}}],{xaxis:{title:'Pureté',range:[0,100]},yaxis:{title:'Solidité',range:[0,12]},margin:{t:20,l:40},paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)'},{displayModeBar:false})};
+        let comparatorChart;
+        function updateComparator(){const dA=masterData[document.getElementById('selectA').value||"weed_sativa"],dB=masterData[document.getElementById('selectB').value||"hash_rosin"];if(comparatorChart)comparatorChart.destroy();comparatorChart=new Chart(document.getElementById('comparatorRadar'),{type:'radar',data:{labels:['Fruité','Terreux','Physique','Odeur','Intensité'],datasets:[{label:dA.name,data:dA.radar,borderColor:'#3B82F6',backgroundColor:'rgba(59,130,246,0.2)'},{label:dB.name,data:dB.radar,borderColor:'#EC4899',backgroundColor:'rgba(236,72,153,0.2)'}]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{suggestedMin:0,suggestedMax:100}}}})}
+        function showDetail(k){const d=masterData[k];showView('detail');document.getElementById('detail-header').className=`bg-white p-8 rounded-2xl shadow-lg border-t-8 border-${d.color}-500`;document.getElementById('detail-badge').innerText=d.badge;document.getElementById('detail-badge').className=`px-3 py-1 rounded-full text-sm font-bold uppercase mb-2 inline-block bg-${d.color}-100 text-${d.color}-800`;document.getElementById('detail-title').innerText=d.name;document.getElementById('detail-title').className=`text-4xl md:text-5xl font-black text-${d.color}-900`;document.getElementById('detail-icon').innerText=d.icon;document.getElementById('detail-desc').innerText=d.desc;document.getElementById('detail-desc').className=`text-lg text-slate-600 border-l-4 border-${d.color}-200 pl-4 text-justify`;document.getElementById('detail-flow').innerHTML=d.process.map(s=>`<div class="bg-slate-700 p-4 rounded-lg border border-slate-600"><div class="text-xs text-${d.color}-400 font-mono uppercase">${s.t}</div><div class="font-bold">${s.d}</div></div>`).join('');const c1=document.getElementById('detailRadarChart'),c2=document.getElementById('detailBarChart');if(c1.chart)c1.chart.destroy();if(c2.chart)c2.chart.destroy();c1.chart=new Chart(c1,{type:'radar',data:{labels:['Fruité','Terreux','Physique','Odeur','Intensité'],datasets:[{label:d.name,data:d.radar,backgroundColor:`${d.hex}33`,borderColor:d.hex,fill:true}]},options:{maintainAspectRatio:false,plugins:{legend:false}}});c2.chart=new Chart(c2,{type:'bar',data:{labels:['Rendement','Puissance','Prix','Tech'],datasets:[{data:d.metrics,backgroundColor:d.hex,borderRadius:6}]},options:{maintainAspectRatio:false,plugins:{legend:false},scales:{y:{max:100}}}})}
+
+        window.addEventListener('load', () => { 
+            const u = new URLSearchParams(window.location.search);
+            const sA = document.getElementById('selectA'), sB = document.getElementById('selectB');
+            Object.keys(masterData).forEach(k => { sA.add(new Option(masterData[k].name, k)); sB.add(new Option(masterData[k].name, k)); });
+            sA.value = "weed_sativa"; sB.value = "hash_rosin";
+            initApp().then(() => { if (u.has('v')) handlePostUpdate(); });
+        });
+    </script>
+</body>
+</html>
