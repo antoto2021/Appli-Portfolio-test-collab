@@ -1308,11 +1308,30 @@
         async function renderInfoView() {
             const lh = localStorage.getItem(UPDATE_STORAGE_KEY) || 'Aucun';
             document.getElementById('info-local-hash').innerText = lh.substring(0, 7) + '...';
+            
+            // --- MODIFICATION ICI : Gestion intelligente du temps (min, h, j, mois) ---
             const lt = localStorage.getItem(UPDATE_TIME_KEY);
             if (lt) {
-                const d = Math.floor((Date.now() - parseInt(lt)) / 60000);
-                document.getElementById('info-local-date').innerText = `Il y a ${d} min`;
+                const diffMs = Date.now() - parseInt(lt);
+                const m = Math.floor(diffMs / 60000);
+                
+                let timeStr;
+                if (m < 60) {
+                    timeStr = `Il y a ${m} min`;
+                } else if (m < 1440) { // Moins de 24h
+                    timeStr = `Il y a ${Math.floor(m / 60)} h`;
+                } else if (m < 43200) { // Moins de 30 jours (24*60*30)
+                    timeStr = `Il y a ${Math.floor(m / 1440)} j`;
+                } else {
+                    timeStr = `Il y a ${Math.floor(m / 43200)} mois`;
+                }
+                
+                document.getElementById('info-local-date').innerText = timeStr;
+            } else {
+                 document.getElementById('info-local-date').innerText = "Date inconnue";
             }
+            // --- FIN MODIFICATION ---
+
             const sd = document.getElementById('connection-status'), re = document.getElementById('info-remote-hash');
             re.innerText = "...";
             sd.className = "w-2 h-2 rounded-full bg-gray-400";
