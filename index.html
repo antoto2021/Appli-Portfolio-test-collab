@@ -1234,7 +1234,7 @@
                 const local = localStorage.getItem(UPDATE_STORAGE_KEY);
                 const remote = document.getElementById('info-remote-hash').innerText.replace('...', '');
                 
-                if (local === remote) {
+                if (local && local.substring(0, 7) === remote) {
                     btn.innerHTML = "✅ À jour";
                 } else {
                     btn.innerHTML = "🚀 M.à.j dispo !";
