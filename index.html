@@ -359,7 +359,7 @@
                             <div class="font-mono text-xs font-bold text-emerald-600 break-all" id="info-remote-hash">...</div>
                         </div>
                     </div>
-                    <button onclick="forceUpdate()" class="mt-4 w-full bg-emerald-600 text-white font-bold py-2 rounded-lg hover:bg-emerald-500 transition text-sm flex justify-center items-center gap-2"><span>🔄</span> Vérifier maintenant</button>
+                    <button onclick="verifyUpdate(this)" class="mt-4 w-full bg-emerald-600 text-white font-bold py-2 rounded-lg hover:bg-emerald-500 transition text-sm flex justify-center items-center gap-2"><span>🔄</span> Vérifier maintenant</button>
                 </div>
 
                 <!-- STOCKAGE -->
@@ -1214,30 +1214,39 @@
             a.classList.add('bouncing');
         }
 
-        async function forceUpdate() {
-            const btn = document.getElementById('refreshBtn'); 
-            // Cible le bouton dans la vue Info
-            const infoBtn = document.querySelector('#view-info button[onclick="forceUpdate()"]');
-            
-            if(infoBtn) {
-                const originalText = infoBtn.innerHTML;
-                infoBtn.innerHTML = "⏳ Vérification...";
-                infoBtn.disabled = true;
-                try {
-                    await renderInfoView(); // Met à jour les infos GitHub sans recharger
-                    infoBtn.innerHTML = "✅ Vérifié";
-                    setTimeout(() => { infoBtn.innerHTML = originalText; infoBtn.disabled = false; }, 2000);
-                } catch(e) {
-                    infoBtn.innerHTML = "❌ Erreur";
-                    setTimeout(() => { infoBtn.innerHTML = originalText; infoBtn.disabled = false; }, 2000);
-                }
-            } else {
-                // Comportement pour le petit bouton flottant
-                document.getElementById('refreshBtn').classList.add('rotating'); 
-                await renderInfoView();
-                setTimeout(() => document.getElementById('refreshBtn').classList.remove('rotating'), 1000);
-            }
+        // Action du bouton flottant (Refresh) : Recharge vraiment la page
+        function forceUpdate() {
+            document.getElementById('refreshBtn').classList.add('rotating');
+            setTimeout(() => {
+                const u = window.location.href.split('?')[0];
+                window.location.href = u + '?v=' + Date.now();
+            }, 500);
         }
+
+        // Action du bouton Info (Vérifier) : Vérifie GitHub sans recharger
+        async function verifyUpdate(btn) {
+            const originalText = btn.innerHTML;
+            btn.innerHTML = "⏳ Vérification...";
+            btn.disabled = true;
+            try {
+                await renderInfoView(); // Met à jour les infos GitHub
+                // Comparaison simple pour le retour visuel
+                const local = localStorage.getItem(UPDATE_STORAGE_KEY);
+                const remote = document.getElementById('info-remote-hash').innerText.replace('...', '');
+                
+                if (local === remote) {
+                    btn.innerHTML = "✅ À jour";
+                } else {
+                    btn.innerHTML = "🚀 M.à.j dispo !";
+                    triggerUpdateUI(); // Affiche la bulle rouge si update dispo
+                }
+            } catch(e) {
+                btn.innerHTML = "❌ Erreur";
+            }
+            // Remet le texte normal après 2 secondes
+            setTimeout(() => { btn.innerHTML = originalText; btn.disabled = false; }, 2000);
+        }
+
 
 
         async function handlePostUpdate() {
